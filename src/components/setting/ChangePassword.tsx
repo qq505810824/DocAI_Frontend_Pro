@@ -20,6 +20,8 @@ import CardActions from '@mui/joy/CardActions';
 import CardOverflow from '@mui/joy/CardOverflow';
 import Skeleton from '@mui/joy/Skeleton';
 
+import { putAction } from '../../swr/common'
+
 const apiSetting = new Api();
 
 function ChangePassword() {
@@ -36,13 +38,12 @@ function ChangePassword() {
             password: '',
             password_confirmation: ''
         },
-        onSubmit: (data) => {
-            putPassword({ data }).then((res) => {
-                if (res.data?.success) {
-                    // request success
-                    setAlert({ title: '更改成功', type: 'success' });
-                }
-            });
+        onSubmit: async (data) => {
+            try {
+                await putAction({ url: '/api/v1/users/me/password', data: data })
+                setAlert({ title: '更改成功', type: 'success' });
+            }
+            catch (e) { }
         },
         validate: ({ password, password_confirmation, current_password }) => {
             const errors: any = {};

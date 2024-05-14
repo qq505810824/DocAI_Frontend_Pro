@@ -4,9 +4,7 @@ import Divider from '@mui/joy/Divider';
 import FormControl from '@mui/joy/FormControl';
 import FormLabel from '@mui/joy/FormLabel';
 import Input from '@mui/joy/Input';
-import useAxios from 'axios-hooks';
 import { FormEvent, FormEventHandler, useCallback, useRef } from 'react';
-import Api from '../../apis';
 import { ShowCurrentUser } from '../../app/setting/SettingContainer';
 import useAlert from '../../hooks/useAlert';
 

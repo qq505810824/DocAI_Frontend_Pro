@@ -22,7 +22,7 @@ export interface ShowCurrentUser {
 
 function SettingContainer() {
     const { data: currentUserData, isLoading: currentUserLoading, error: currentUserError }
-        = useSWR({ url: '/api/v1/users/me' }, getAction)
+        = useSWR('/api/v1/users/me', getAction)
     return (
         <SettingView
             {...{
