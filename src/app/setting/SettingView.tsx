@@ -4,26 +4,19 @@ import TabList from '@mui/joy/TabList';
 import TabPanel from '@mui/joy/TabPanel';
 import Tabs from '@mui/joy/Tabs';
 
-import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
-import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
-import Button from '@mui/joy/Button';
-
 import { ShowCurrentUser } from './SettingContainer';
 import Profile from '../../components/setting/Profile';
 import ChangePassword from '../../components/setting/ChangePassword';
 import Gmail from '../../components/setting/Gmail';
 import { signIn, signOut } from 'next-auth/react';
-import { useSession, SessionProvider } from 'next-auth/react';
 
 interface SettingViewProps {
-    currentUserData: ShowCurrentUser | undefined;
+    currentUserData: any;
     currentUserLoading: boolean;
-    session?: any | null;
 }
 export default function SettingView({
     currentUserData,
-    currentUserLoading,
-    session
+    currentUserLoading
 }: SettingViewProps) {
     return (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>

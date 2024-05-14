@@ -1,15 +1,12 @@
 'use client';
-
-import Api from '@/apis';
 import useAlert from '@/hooks/useAlert';
 import useLoad from '@/hooks/useLoad';
-import useAxios from 'axios-hooks';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import SettingView from './SettingView';
-import { useSession, SessionProvider } from 'next-auth/react';
 
-const apiSetting = new Api();
+import useSWR from 'swr';
+import { getAction } from '../../swr/common'
 
 export interface ShowCurrentUser {
     success: boolean;
@@ -24,33 +21,15 @@ export interface ShowCurrentUser {
 }
 
 function SettingContainer() {
-    const router = useRouter();
-    // const { data: session } = useSession();
-
-    const [
-        { data: currentUserData, loading: currentUserLoading, error: currentUserError },
-        showCurrentUser
-    ] = useAxios<ShowCurrentUser>(apiSetting.User.showCurrentUser(), { manual: true });
-
-    useEffect(() => {
-        showCurrentUser();
-    }, []);
-
-    // useEffect(() => {
-    //     console.log(session);
-    // }, [session]);
-
+    const { data: currentUserData, isLoading: currentUserLoading, error: currentUserError }
+        = useSWR({ url: '/api/v1/users/me' }, getAction)
     return (
-        // <SessionProvider>
         <SettingView
             {...{
                 currentUserData,
                 currentUserLoading
-                // session
             }}
         />
-        // </SessionProvider>
     );
 }
-
 export default SettingContainer;

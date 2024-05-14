@@ -154,6 +154,8 @@ const baseFetch = <T>(
   if (body && bodyStringify)
     options.body = JSON.stringify(body)
 
+  console.log('options.body',options.body)
+  console.log('method, params, body',method, params, body)
   // Handle timeout
   return Promise.race([
     new Promise((resolve, reject) => {
@@ -223,6 +225,8 @@ const baseFetch = <T>(
 
           // return data
           const data: Promise<T> = options.headers.get('Content-type') === ContentType.download ? res.blob() : res.json()
+          console.log('resClone',resClone)
+          console.log('data',data)
           resolve(needAllResponseContent ? resClone : data)
         })
         .catch((err) => {

@@ -18,32 +18,31 @@ import RadioGroup from '@mui/joy/RadioGroup';
 import Skeleton from '@mui/joy/Skeleton';
 import Stack from '@mui/joy/Stack';
 
-const apiSetting = new Api();
+import { putAction } from '../../swr/common'
 
 interface ProfileProps {
-    currentUserData: ShowCurrentUser | undefined;
+    currentUserData: any;
     currentUserLoading: boolean;
 }
+
 function Profile({ currentUserData, currentUserLoading }: ProfileProps) {
     const { setAlert } = useAlert();
     const formRef = useRef<HTMLFormElement>(null);
-    const [{}, updateMeProfile] = useAxios(apiSetting.User.updateMeProfile(), { manual: true });
-    const formSubmit: FormEventHandler = useCallback(
-        (e: FormEvent) => {
-            e.preventDefault();
-            if (!formRef.current) return;
-            const formData = new FormData(formRef.current);
-            const data: any = {};
-            formData.forEach((value, key) => (data[key] = value));
-            updateMeProfile({
-                data,
-                ...apiSetting.User.updateMeProfile()
-            }).then((res) => {
-                if (res.data?.success) {
-                    setAlert({ title: '儲存成功', type: 'success' });
-                } else setAlert({ title: '儲存失敗', type: 'error' });
-            });
-        },
+
+    const formSubmit: FormEventHandler = useCallback(async (e: FormEvent) => {
+        e.preventDefault();
+        if (!formRef.current) return;
+        const formData = new FormData(formRef.current);
+        const data: any = {};
+        formData.forEach((value, key) => (data[key] = value));
+        try {
+            await putAction({ url: '/api/v1/users/me/profile', data: data })
+            setAlert({ title: '儲存成功', type: 'success' });
+        }
+        catch (e) {
+            setAlert({ title: '儲存失敗', type: 'error' });
+        }
+    },
         [formRef, currentUserData]
     );
     return (
@@ -135,13 +134,14 @@ function Profile({ currentUserData, currentUserLoading }: ProfileProps) {
                                     <Input
                                         type="date"
                                         name="date_of_birth"
+                                        size="sm"
                                         defaultValue={currentUserData?.user?.date_of_birth || ''}
-                                        // slotProps={{
-                                        //     input: {
-                                        //         min: '2018-06-07',
-                                        //         max: '2018-06-14',
-                                        //     },
-                                        // }}
+                                    // slotProps={{
+                                    //     input: {
+                                    //         min: '2018-06-07',
+                                    //         max: '2018-06-14',
+                                    //     },
+                                    // }}
                                     />
                                 </FormControl>
                                 <FormControl sx={{ flexGrow: 1 }}>
@@ -151,6 +151,7 @@ function Profile({ currentUserData, currentUserLoading }: ProfileProps) {
                                             currentUserData?.user?.sex === 1 ? 'male' : 'female'
                                         }
                                         name="sex"
+                                        size="sm"
                                         // value={value}
                                         // onChange={handleChange}
                                         sx={{

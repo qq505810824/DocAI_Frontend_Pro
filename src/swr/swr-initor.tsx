@@ -17,8 +17,8 @@ const SwrInitor = ({
 }: SwrInitorProps) => {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const consoleToken = searchParams.get('console_token')
-  const consoleTokenFromLocalStorage = localStorage?.getItem('console_token')
+  const consoleToken = searchParams.get('authorization')
+  const consoleTokenFromLocalStorage = localStorage?.getItem('authorization')
   const [init, setInit] = useState(false)
 
   useEffect(() => {
@@ -26,7 +26,7 @@ const SwrInitor = ({
     //   router.replace('/login')
 
     // if (consoleToken) {
-    //   localStorage?.setItem('console_token', consoleToken!)
+    //   localStorage?.setItem('authorization', consoleToken!)
     //   router.replace('/', { forceOptimisticNavigation: false } as any)
     // }
     setInit(true)
@@ -37,7 +37,6 @@ const SwrInitor = ({
       <SWRConfig value={{
         shouldRetryOnError: false,
         revalidateOnFocus: false,
-        // fetcher: url => useAxios(url, { manual: true })
       }}>
         {children}
       </SWRConfig>

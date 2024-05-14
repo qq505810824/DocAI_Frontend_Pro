@@ -3,14 +3,12 @@
 import useAxios from 'axios-hooks';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import Api from '../../apis';
 import ShopView from './ShopView';
 
 import useSWR from 'swr';
 import { getAction } from '../../swr/common'
 
 export default function ShopContainer() {
-    const router = useRouter();
     const [open, setOpen] = useState(false);
 
     const { data: showAllChatbotsData, error: showAllChatbotsError, isLoading: showAllChatbotsLoading }
