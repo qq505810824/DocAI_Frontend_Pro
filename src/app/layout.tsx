@@ -11,6 +11,8 @@ import { useRouter } from 'next/navigation';
 import * as React from 'react';
 import { Helmet } from 'react-helmet';
 import './globals.css';
+import SwrInitor from '../swr//swr-initor'
+
 // import { SessionProvider } from 'next-auth/react';
 // import SessionProvider from './api/auth/SessionProvider';
 // import { SessionProvider } from "next-auth/react"
@@ -45,23 +47,25 @@ export default function RootLayout(props: { children: React.ReactNode }) {
     return (
         <html lang="en">
             <body>
-                <LoadProvider>
-                    <SessionProvider>
-                        <AlertProvider>
-                            <script
-                                src="https://accounts.google.com/gsi/client"
-                                async
-                                defer
-                            ></script>
-                            <Helmet>
-                                <script src="https://code.highcharts.com/highcharts.js"></script>
-                            </Helmet>
-                            <ThemeRegistry>{props.children}</ThemeRegistry>
-                            <AlertModel />
-                        </AlertProvider>
-                    </SessionProvider>
-                    <LoadModel />
-                </LoadProvider>
+                <SwrInitor>
+                    <LoadProvider>
+                        <SessionProvider>
+                            <AlertProvider>
+                                <script
+                                    src="https://accounts.google.com/gsi/client"
+                                    async
+                                    defer
+                                ></script>
+                                <Helmet>
+                                    <script src="https://code.highcharts.com/highcharts.js"></script>
+                                </Helmet>
+                                <ThemeRegistry>{props.children}</ThemeRegistry>
+                                <AlertModel />
+                            </AlertProvider>
+                        </SessionProvider>
+                        <LoadModel />
+                    </LoadProvider>
+                </SwrInitor>
             </body>
         </html>
     );

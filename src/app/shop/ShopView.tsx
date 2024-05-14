@@ -1,6 +1,5 @@
 import { Box, Typography } from '@mui/joy';
 import ShopRow from '../../components/shop/ShopRow';
-
 interface ViewProps {
     open: boolean;
     setOpen: any;
