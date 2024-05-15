@@ -11,7 +11,12 @@ import Modal from '@mui/joy/Modal';
 import ModalDialog from '@mui/joy/ModalDialog';
 import Stack from '@mui/joy/Stack';
 import _ from 'lodash';
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useCallback } from 'react';
+
+import useSWR, { mutate } from 'swr';
+import useSWRMutation from 'swr';
+import { getAction, postAction } from '../../../swr/common'
+
 
 interface EditLabelProps {
     open: boolean;
@@ -120,8 +125,8 @@ export default function EditLabel(props: EditLabelProps) {
                                                             );
                                                         }
                                                     }}
-                                                    // sx={{ [`& > .${checkboxClasses.checkbox}`]: { position: 'relative' } }}
-                                                    // slotProps={{ action: { className: checkboxClasses.focusVisible } }}
+                                                // sx={{ [`& > .${checkboxClasses.checkbox}`]: { position: 'relative' } }}
+                                                // slotProps={{ action: { className: checkboxClasses.focusVisible } }}
                                                 />
                                             );
                                         })}

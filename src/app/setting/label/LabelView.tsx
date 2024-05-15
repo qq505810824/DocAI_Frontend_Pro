@@ -15,7 +15,7 @@ import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
 interface ViewProps {
     addNewLabelHandler: any;
     addNewLabelData: any;
-    getAllLabelsData: {
+    getAllLabelsData?: {
         tags: {
             id: string;
             name: string;

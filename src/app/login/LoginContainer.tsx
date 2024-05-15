@@ -8,10 +8,13 @@ import React, { FormEventHandler, useCallback, useEffect } from 'react';
 import Api from '../../apis';
 import LoginView from './LoginView';
 
+import { loginFetcher } from '../../swr/common';
+import useSWR from 'swr';
 const apiSetting = new Api();
 
 function LoginContainer() {
     const [data, setData] = React.useState();
+    const [isLoading, setIsLoading] = React.useState(false)
     const { setAlert } = useAlert();
     const router = useRouter();
     const pathname = usePathname();
@@ -20,12 +23,35 @@ function LoginContainer() {
         {},
         { manual: true }
     );
+    //这个会无限刷新
+    // const { data: data1, isLoading: loading1, error: error1 } = useSWR('/api/login', loginFetcher);
 
     useEffect(() => {
         localStorage.removeItem('authorization');
         localStorage.removeItem('email');
         document.cookie = `authorization=null; expires=Thu, 01 Jan 1970 00:00:01 GMT`;
     }, []);
+
+    // const handleSignIn: FormEventHandler<HTMLFormElement> = useCallback(
+    //     async (e) => {
+    //         e.preventDefault();
+    //         const formData = new FormData(e.currentTarget);
+    //         const email = formData.get('email') as string;
+    //         const password = formData.get('password') as string;
+    //         const remember = formData.get('persistent');
+    //         axios.defaults.headers.common['authorization'] = '';
+    //         try {
+    //             setIsLoading(true)
+    //             const res = await loginFetcher({ email, password });
+    //             if (signInData) {
+    //                 console.log(signInData)
+    //             }
+    //         } finally {
+    //             setIsLoading(false)
+
+    //         }
+    //     }, [router, signInData]
+    // );
 
     const handleSignIn: FormEventHandler<HTMLFormElement> = useCallback(
         async (e) => {
@@ -54,9 +80,9 @@ function LoginContainer() {
                 localStorage.removeItem('email');
                 document.cookie = `authorization=null; expires=Thu, 01 Jan 1970 00:00:01 GMT`;
             }
-        },
-        [router, signIn]
+        }, [router, signIn]
     );
+
     return (
         <LoginView
             {...{

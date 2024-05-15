@@ -154,8 +154,8 @@ const baseFetch = <T>(
   if (body && bodyStringify)
     options.body = JSON.stringify(body)
 
-  console.log('options.body',options.body)
-  console.log('method, params, body',method, params, body)
+  console.log('options.body', options.body)
+  console.log('method, params, body', method, params, body)
   // Handle timeout
   return Promise.race([
     new Promise((resolve, reject) => {
@@ -167,7 +167,7 @@ const baseFetch = <T>(
       globalThis.fetch(urlWithPrefix, options as RequestInit)
         .then((res) => {
           const resClone = res.clone()
-
+          console.log('resClone', resClone)
           // Error handler
           if (!/^(2|3)\d{2}$/.test(String(res.status))) {
             const bodyJson = res.json()
@@ -225,8 +225,8 @@ const baseFetch = <T>(
 
           // return data
           const data: Promise<T> = options.headers.get('Content-type') === ContentType.download ? res.blob() : res.json()
-          console.log('resClone',resClone)
-          console.log('data',data)
+
+          console.log('data', data)
           resolve(needAllResponseContent ? resClone : data)
         })
         .catch((err) => {
