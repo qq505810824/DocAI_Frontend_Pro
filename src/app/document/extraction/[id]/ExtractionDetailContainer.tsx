@@ -8,6 +8,9 @@ import { getAllChainFeatureDatas } from '../../../../apis/AirtableChainFeature';
 import useAlert from '../../../../hooks/useAlert';
 import ExtractionDetailView from './ExtractionDetailView';
 
+import useSWR from 'swr';
+import { getTagByIdFetcher,deleteAction } from '../../../../swr/common'
+
 const apiSetting = new Api();
 
 export default function ExtractionDetailContainer() {
@@ -15,23 +18,24 @@ export default function ExtractionDetailContainer() {
     const { id } = useParams();
     const { setAlert } = useAlert();
     const [open, setOpen] = useState(false);
-    const [label, setLabel] = useState();
+    const [label, setLabel] = useState<any>();
     const [meta, setMeta] = useState();
     const [page, setPage] = useState(1);
     const [chain_features, set_chain_features] = useState<any>([]);
     const [smart_extraction_schemas, set_smart_extraction_schemas] = useState<any>([]);
+
 
     //数据提取，填表，推荐功能 ———— MUI中不需要判断TypeValue
     // const [currentTypeTab, setCurrentTypeTab] = useState<
     //     'extraction' | 'form_filling' | 'chain_feature'
     // >('extraction');
 
-    const [{ data: getTagByIdData, loading: getTagByIdLoading }, getTagById] = useAxios(
-        apiSetting.Tag.getTagById(''),
-        {
-            manual: true
-        }
-    );
+    // const [{ data: getTagByIdData1, loading: getTagByIdLoading }, getTagById1] = useAxios(
+    //     apiSetting.Tag.getTagById(''),
+    //     {
+    //         manual: true
+    //     }
+    // );
 
     const [{ data: getAllSmartExtractionSchemasData, loading }, getAllSmartExtractionSchemas] =
         useAxios(apiSetting.SmartExtractionSchemas.getSmartExtractionSchemasByLabel('', page), {
@@ -58,6 +62,21 @@ export default function ExtractionDetailContainer() {
     const [{ data: deleteTagFunctionsData, error: deleteTagFunctionsError }, deleteTagFunctions] =
         useAxios(apiSetting.Tag.deleteTagFunctions(), { manual: true });
 
+    const getTagById = async (id: string) => {
+        try {
+            const res = await getTagByIdFetcher(id)
+            if (res && res.success){
+                setLabel(res.tag);
+            }
+        } catch (e) { }
+    }
+
+    useEffect(() => {
+
+    }, [])
+
+
+
     useEffect(() => {
         if (router && id) {
             getAllSmartExtractionSchemas({
@@ -66,9 +85,7 @@ export default function ExtractionDetailContainer() {
                     page
                 )
             });
-            getTagById({
-                ...apiSetting.Tag.getTagById(id as string)
-            });
+            getTagById(id as string);
             getAllTagFunctions();
             getAllChainFeatureDatas().then((datas) => {
                 set_chain_features(datas);
@@ -88,13 +105,7 @@ export default function ExtractionDetailContainer() {
         }
     }, [getAllSmartExtractionSchemasData]);
 
-    useEffect(() => {
-        if (getTagByIdData && getTagByIdData.success) {
-            setLabel(getTagByIdData.tag);
-        }
-    }, [getTagByIdData]);
 
-    useEffect(() => {}, []);
 
     const updateTagFeatureHandler = useCallback(
         async (tag_id: string, chain_feature_ids: []) => {
