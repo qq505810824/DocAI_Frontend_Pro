@@ -9,7 +9,7 @@ import useAlert from '../../../../hooks/useAlert';
 import ExtractionDetailView from './ExtractionDetailView';
 
 import useSWR from 'swr';
-import { getTagByIdFetcher, deleteActionWithParams, deleteTag } from '../../../../swr/common'
+import { getTagByIdFetcher, deleteAction, postAction, putAction } from '../../../../swr/common'
 
 const apiSetting = new Api();
 
@@ -30,52 +30,15 @@ export default function ExtractionDetailContainer() {
     //     'extraction' | 'form_filling' | 'chain_feature'
     // >('extraction');
 
-    // const [{ data: getTagByIdData1, loading: getTagByIdLoading }, getTagById1] = useAxios(
-    //     apiSetting.Tag.getTagById(''),
-    //     {
-    //         manual: true
-    //     }
-    // );
-
     const [{ data: getAllSmartExtractionSchemasData, loading }, getAllSmartExtractionSchemas] =
         useAxios(apiSetting.SmartExtractionSchemas.getSmartExtractionSchemasByLabel('', page), {
             manual: true
         });
 
-    const [{ data: updateTagFeaturesData }, updateTagFeatures] = useAxios(
-        apiSetting.Tag.updateTagFeatures(''),
-        { manual: true }
-    );
-
-    const [{ data: updateTagNameData }, updateTagName] = useAxios(
-        apiSetting.Tag.updateTagNameById(''),
-        { manual: true }
-    );
-
     const [{ data: tagTypes, error: getAllTagFunctionsError }, getAllTagFunctions] = useAxios(
         apiSetting.Tag.getTagFunctions(),
         { manual: true }
     );
-    const [{ data: updateTagFunctionsData, error: updateTagFunctionsError }, updateTagFunctions] =
-        useAxios(apiSetting.Tag.updateTagFunctions(), { manual: true });
-
-    const [{ data: deleteTagFunctionsData, error: deleteTagFunctionsError }, deleteTagFunctions] =
-        useAxios(apiSetting.Tag.deleteTagFunctions(), { manual: true });
-
-    const getTagById = async (id: string) => {
-        try {
-            const res = await getTagByIdFetcher(id)
-            if (res && res.success) {
-                setLabel(res.tag);
-            }
-        } catch (e) { }
-    }
-
-    useEffect(() => {
-
-    }, [])
-
-
 
     useEffect(() => {
         if (router && id) {
@@ -93,6 +56,16 @@ export default function ExtractionDetailContainer() {
         }
     }, [router]);
 
+    const getTagById = async (id: string) => {
+        try {
+            const res = await getTagByIdFetcher(id)
+            if (res && res.success) {
+                setLabel(res.tag);
+            }
+        } catch (e) { }
+    }
+
+
     useEffect(() => {
         setOpen(loading);
     }, [loading]);
@@ -106,66 +79,55 @@ export default function ExtractionDetailContainer() {
     }, [getAllSmartExtractionSchemasData]);
 
 
-
-    const updateTagFeatureHandler = useCallback(
-        async (tag_id: string, chain_feature_ids: []) => {
-            updateTagFeatures({
-                ...apiSetting.Tag.updateTagFeatures(tag_id),
-                data: { chain_features: chain_feature_ids }
-            }).then((res) => {
-                if (res.data.success) {
-                    setAlert({ title: '更新成功', type: 'success' });
-                } else {
-                    setAlert({ title: '更新失敗', type: 'error' });
-                }
-            });
-        },
-        [updateTagFeatures]
-    );
-
-    const updateTagNameHandler = useCallback(
-        async (tag_id: string, tag_name: string) => {
-            updateTagName({
-                ...apiSetting.Tag.updateTagNameById(tag_id),
-                data: { name: tag_name }
-            }).then((res) => {
-                if (res.data.success) {
-                    setAlert({ title: '更新成功', type: 'success' });
-                } else {
-                    setAlert({ title: '更新失敗', type: 'error' });
-                }
-            });
-        },
-        [updateTagName]
-    );
-
-    const updateTagFunctionsHandler = useCallback(
-        async (tag_id: string, function_id: string) => {
-            if (function_id)
-                updateTagFunctions({
-                    data: { tag_id: tag_id, function_id: function_id }
-                }).then((res) => {
-                    if (res.data.success) {
-                        setAlert({ title: '更新成功', type: 'success' });
-                    } else {
-                        setAlert({ title: '更新失敗', type: 'error' });
-                    }
-                });
-        },
-        [updateTagFunctions]
-    );
-
-    const deleteTagFunctionsHandler = useCallback(async (tag_id: string, function_id: string) => {
+    const updateTagFeatureHandler = useCallback(async (tag_id: string, chain_feature_ids: []) => {
         try {
-            await deleteActionWithParams({
-                url: '/api/v1/tags/function',
-                body: { tag_id: tag_id, function_id: function_id }
+            await putAction({
+                url: `/api/v1/tags/${tag_id}/features`,
+                data: { chain_features: chain_feature_ids }
             })
             setAlert({ title: '更新成功', type: 'success' });
         } catch (e) {
             setAlert({ title: '更新失敗', type: 'error' });
         }
-    }, [])
+    }, [putAction])
+
+    const updateTagNameHandler = useCallback(async (tag_id: string, tag_name: string) => {
+        try {
+            await putAction({
+                url: `/api/v1/tags/${tag_id}`,
+                data: { name: tag_name }
+            })
+            setAlert({ title: '更新成功', type: 'success' });
+        } catch (e) {
+            setAlert({ title: '更新失敗', type: 'error' });
+        }
+    }, [putAction])
+
+    const updateTagFunctionsHandler = useCallback(async (tag_id: string, function_id: string) => {
+        if (function_id)
+            try {
+                await postAction({
+                    url: '/api/v1/tags/function',
+                    data: { tag_id: tag_id, function_id: function_id }
+                })
+                setAlert({ title: '更新成功', type: 'success' });
+            } catch (e) {
+                setAlert({ title: '更新失敗', type: 'error' });
+            }
+    }, [postAction])
+
+    const deleteTagFunctionsHandler = useCallback(async (tag_id: string, function_id: string) => {
+        if (function_id)
+            try {
+                await deleteAction({
+                    url: '/api/v1/tags/function',
+                    data: { tag_id: tag_id, function_id: function_id }
+                })
+                setAlert({ title: '更新成功', type: 'success' });
+            } catch (e) {
+                setAlert({ title: '更新失敗', type: 'error' });
+            }
+    }, [deleteAction])
 
     return (
         <ExtractionDetailView
