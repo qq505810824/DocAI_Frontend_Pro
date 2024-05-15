@@ -21,18 +21,17 @@ type CommonResponse = {
 type LabelResponse = {
   success: boolean;
   tag: any;
-  // {
-  //   name: string;
-  //   id: string;
-  //   meta: { chain_features: string };
-  //   functions: Array<{ id: string }>;
-  // }
+}
+type SmartExtractionSchemasResponse={
+  success: boolean;
+  meta: any;
+  smart_extraction_schema: any;
 }
 
 
 // label
-export const getSmartExtractionSchemasByLabel: Fetcher<null, { id: string; page: string }> = ({ id, page }) => {
-  return get<null>(`/api/v1/smart_extraction_schemas/label/${id}?page=${page}`)
+export const getSmartExtractionSchemasByLabelFetcher: Fetcher<SmartExtractionSchemasResponse, { id: string; page: number }> = ({ id, page }) => {
+  return get<SmartExtractionSchemasResponse>(`/api/v1/smart_extraction_schemas/label/${id}?page=${page}`)
 }
 export const getTagByIdFetcher: Fetcher<LabelResponse, string> = (id) => {
   return get<LabelResponse>(`/api/v1/tags/${id}`)
@@ -45,8 +44,8 @@ export const deleteAction: Fetcher<CommonResponse, { url: string, data?: Record<
 
 
 // useSWR('/api/v1/chatbots'}, getAction)
-export const getAction: Fetcher<null, string> = (url) => {
-  return get<null>(url)
+export const getAction: Fetcher<CommonResponse, string> = (url) => {
+  return get<CommonResponse>(url)
 }
 
 

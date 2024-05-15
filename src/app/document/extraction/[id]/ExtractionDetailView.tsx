@@ -17,8 +17,6 @@ import SchemaList from '../../../../components/document/extraction/SchemasList';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 
 interface ExtractionDetailViewProps {
-    open: boolean;
-    setOpen: any;
     label: any;
     // currentTypeTab: string;
     // setCurrentTypeTab: any;
@@ -34,8 +32,6 @@ interface ExtractionDetailViewProps {
 
 function ExtractionDetailView(props: ExtractionDetailViewProps) {
     const {
-        open,
-        setOpen,
         label,
         // currentTypeTab,
         // setCurrentTypeTab,

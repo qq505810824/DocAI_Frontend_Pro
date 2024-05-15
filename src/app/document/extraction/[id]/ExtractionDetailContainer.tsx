@@ -9,7 +9,7 @@ import useAlert from '../../../../hooks/useAlert';
 import ExtractionDetailView from './ExtractionDetailView';
 
 import useSWR from 'swr';
-import { getTagByIdFetcher, deleteAction, postAction, putAction } from '../../../../swr/common'
+import { getTagByIdFetcher, getSmartExtractionSchemasByLabelFetcher, deleteAction, postAction, putAction, getAction } from '../../../../swr/common'
 
 const apiSetting = new Api();
 
@@ -30,31 +30,27 @@ export default function ExtractionDetailContainer() {
     //     'extraction' | 'form_filling' | 'chain_feature'
     // >('extraction');
 
-    const [{ data: getAllSmartExtractionSchemasData, loading }, getAllSmartExtractionSchemas] =
-        useAxios(apiSetting.SmartExtractionSchemas.getSmartExtractionSchemasByLabel('', page), {
-            manual: true
-        });
-
-    const [{ data: tagTypes, error: getAllTagFunctionsError }, getAllTagFunctions] = useAxios(
-        apiSetting.Tag.getTagFunctions(),
-        { manual: true }
-    );
+    const { data: tagTypes, error } = useSWR('/api/v1/functions', getAction);
 
     useEffect(() => {
         if (router && id) {
-            getAllSmartExtractionSchemas({
-                ...apiSetting.SmartExtractionSchemas.getSmartExtractionSchemasByLabel(
-                    id as string,
-                    page
-                )
-            });
+            getAllSmartExtractionSchemas(id as string, page);
             getTagById(id as string);
-            getAllTagFunctions();
             getAllChainFeatureDatas().then((datas) => {
                 set_chain_features(datas);
             });
         }
     }, [router]);
+
+    const getAllSmartExtractionSchemas = async (id: string, page = 1) => {
+        try {
+            const res = await getSmartExtractionSchemasByLabelFetcher({id, page})
+            if (res && res.success) {
+                set_smart_extraction_schemas(res.smart_extraction_schema);
+                setMeta(res.meta);
+            }
+        } catch (e) { }
+    }
 
     const getTagById = async (id: string) => {
         try {
@@ -64,20 +60,6 @@ export default function ExtractionDetailContainer() {
             }
         } catch (e) { }
     }
-
-
-    useEffect(() => {
-        setOpen(loading);
-    }, [loading]);
-
-    useEffect(() => {
-        if (getAllSmartExtractionSchemasData && getAllSmartExtractionSchemasData.success) {
-            // console.log('getAllSmartExtractionSchemasData', getAllSmartExtractionSchemasData);
-            set_smart_extraction_schemas(getAllSmartExtractionSchemasData.smart_extraction_schema);
-            setMeta(getAllSmartExtractionSchemasData.meta);
-        }
-    }, [getAllSmartExtractionSchemasData]);
-
 
     const updateTagFeatureHandler = useCallback(async (tag_id: string, chain_feature_ids: []) => {
         try {
@@ -132,8 +114,6 @@ export default function ExtractionDetailContainer() {
     return (
         <ExtractionDetailView
             {...{
-                open,
-                setOpen,
                 label,
                 // currentTypeTab,
                 // setCurrentTypeTab,
