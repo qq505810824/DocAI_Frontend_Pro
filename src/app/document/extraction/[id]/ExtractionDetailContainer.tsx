@@ -9,7 +9,7 @@ import useAlert from '../../../../hooks/useAlert';
 import ExtractionDetailView from './ExtractionDetailView';
 
 import useSWR from 'swr';
-import { getTagByIdFetcher,deleteAction } from '../../../../swr/common'
+import { getTagByIdFetcher, deleteActionWithParams, deleteTag } from '../../../../swr/common'
 
 const apiSetting = new Api();
 
@@ -65,7 +65,7 @@ export default function ExtractionDetailContainer() {
     const getTagById = async (id: string) => {
         try {
             const res = await getTagByIdFetcher(id)
-            if (res && res.success){
+            if (res && res.success) {
                 setLabel(res.tag);
             }
         } catch (e) { }
@@ -155,21 +155,17 @@ export default function ExtractionDetailContainer() {
         [updateTagFunctions]
     );
 
-    const deleteTagFunctionsHandler = useCallback(
-        async (tag_id: string, function_id: string) => {
-            if (function_id)
-                deleteTagFunctions({
-                    data: { tag_id: tag_id, function_id: function_id }
-                }).then((res) => {
-                    if (res.data.success) {
-                        setAlert({ title: '更新成功', type: 'success' });
-                    } else {
-                        setAlert({ title: '更新失敗', type: 'error' });
-                    }
-                });
-        },
-        [deleteTagFunctions]
-    );
+    const deleteTagFunctionsHandler = useCallback(async (tag_id: string, function_id: string) => {
+        try {
+            await deleteActionWithParams({
+                url: '/api/v1/tags/function',
+                body: { tag_id: tag_id, function_id: function_id }
+            })
+            setAlert({ title: '更新成功', type: 'success' });
+        } catch (e) {
+            setAlert({ title: '更新失敗', type: 'error' });
+        }
+    }, [])
 
     return (
         <ExtractionDetailView

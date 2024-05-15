@@ -39,8 +39,14 @@ export const getTagByIdFetcher: Fetcher<LabelResponse, string> = (id) => {
 }
 
 
-export const deleteAction: Fetcher<CommonResponse,string> = (url) => {
+export const deleteAction: Fetcher<CommonResponse, string> = (url) => {
   return del<CommonResponse>(url)
+}
+export const deleteActionWithParams: Fetcher<CommonResponse, { url: string, body: Record<string, any> }> = ({ url, body }) => {
+  return del<CommonResponse>(url, { body })
+}
+export const deleteTag: Fetcher<CommonResponse, { url: string, body: { tag_id: string, function_id: string } }> = ({ url, body }) => {
+  return del<CommonResponse>('api/v1/tags/function', body)
 }
 
 // useSWR('/api/v1/chatbots'}, getAction)
