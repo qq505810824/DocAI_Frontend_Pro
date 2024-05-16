@@ -2,7 +2,7 @@ import { del, get, post, put } from './base'
 import type { Fetcher } from 'swr'
 
 //类型断言
-type CommonResponse = {
+export type CommonResponse = {
   success: boolean;
   errors: { name: string };
 }
