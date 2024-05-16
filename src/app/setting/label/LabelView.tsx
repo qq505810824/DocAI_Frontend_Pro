@@ -15,15 +15,16 @@ import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
 interface ViewProps {
     addNewLabelHandler: any;
     addNewLabelData: any;
-    getAllLabelsData?: {
-        tags: {
-            id: string;
-            name: string;
-            taggings_count: number;
-            updated_at: string;
-            created_at: string;
-        }[];
-    };
+    getAllLabelsData?: any;
+    //     getAllLabelsData?: {
+    //     tags: {
+    //         id: string;
+    //         name: string;
+    //         taggings_count: number;
+    //         updated_at: string;
+    //         created_at: string;
+    //     }[];
+    // };
     setNewLabelName: any;
     newLabelName: string;
     updateLabelNameByIdHandler: any;

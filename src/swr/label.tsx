@@ -35,6 +35,6 @@ export const getTagByIdFetcher: Fetcher<LabelResponse, string> = (id) => {
   return get<LabelResponse>(`/api/v1/tags/${id}`)
 }
 
-export const getAllLabelsFetcher: Fetcher<getAllLabelsData, string> = (url) => {
-  return get<getAllLabelsData>(url)
-}
+// export const getAllLabelsFetcher: Fetcher<getAllLabelsData, string> = (url) => {
+//   return get<getAllLabelsData>(url)
+// }
