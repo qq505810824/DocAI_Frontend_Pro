@@ -53,6 +53,7 @@ export default function ChatbotTable(props: ViewProps) {
                     minHeight: 0
                 }}
             >
+                {chatbots &&
                 <Box>
                     {chatbots.length == 0 ? (
                         <LoaderView />
@@ -169,6 +170,7 @@ export default function ChatbotTable(props: ViewProps) {
                         </Box>
                     ))}
                 </Box>
+                }
             </Sheet>
             <Box
                 className="Pagination-laptopUp"

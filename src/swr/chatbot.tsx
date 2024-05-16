@@ -10,6 +10,7 @@ type AllChatbotsResponse = {
   meta: any;
   chatbots: Chatbots[]
 }
+
 type Chatbots = {
   chatbot: Chatbot;
   folders: any;
@@ -36,7 +37,7 @@ type sharePromise = {
 
 // label
 export const getAllChatbotsFetcher: Fetcher<AllChatbotsResponse, { page: string }> = (page) => {
-  return get<AllChatbotsResponse>(`/api/v1/tags`, { page })
+  return get<AllChatbotsResponse>(`/api/v1/chatbots`, { page })
 }
 
 export const shareAuction = async (url: string) => {

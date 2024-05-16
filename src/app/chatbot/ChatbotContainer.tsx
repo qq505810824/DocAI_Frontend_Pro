@@ -10,7 +10,8 @@ import { useEffect, useState, useCallback } from 'react';
 import ChatbotView from './ChatbotView';
 
 import useSWR from 'swr';
-import { deleteAction, putAction, getAction, getActionWithParams } from '../../swr/common'
+import useSWRInfinite from 'swr/infinite'
+import { deleteAction } from '../../swr/common'
 import { getAllChatbotsFetcher, shareAuction } from '../../swr/chatbot'
 
 
@@ -44,25 +45,15 @@ function ChatbotContainer() {
     const [meta, setMeta] = useState<any>();
     const [visibleQRcode, setVisibleQRcode] = useState(false);
     const [qrcodeContent, setQrcodeContent] = useState<any>();
-    const [
-        { data: showAllChatbotsData, loading: showAllChatbotsLoading, error: showAllChatbotsError },
-        getAllChatbots
-    ] = useAxios({}, { manual: true });
-    // const { data: showAllChatbotsData, isLoading: getChatbotLoading }
-    //     = useSWR({page:page}, getAllChatbotsFetcher)
-
-    const [{ data: deleteChatbotByIdData }, deleteChatbotById] = useAxios(
-        apiSetting.Chatbot.deleteChatbotById(''),
-        { manual: true }
-    );
-
-
-    const [{ data: getShareSignatureData, loading: getShareSignatureLoading }, getShareSignature] =
-        useAxios({}, { manual: true });
+    // const [
+    //     { data: showAllChatbotsData, loading: showAllChatbotsLoading, error: showAllChatbotsError },
+    //     getAllChatbots
+    // ] = useAxios({}, { manual: true });
+    const { data: showAllChatbotsData, isLoading: getChatbotLoading }
+        = useSWR({ page: page }, getAllChatbotsFetcher)
 
     useEffect(() => {
         setLoad({ show: false });
-        getAllChatbots(apiSetting.Chatbot.showAllChatbots(page));
     }, [page]);
 
     useEffect(() => {
@@ -72,7 +63,7 @@ function ChatbotContainer() {
     }, [searchParams]);
 
     useEffect(() => {
-        if (showAllChatbotsData?.success) {
+        if (!getChatbotLoading && showAllChatbotsData?.success) {
             setChatbots(showAllChatbotsData.chatbots);
             setMeta(showAllChatbotsData.meta);
             setLoad({ show: false });
@@ -80,7 +71,7 @@ function ChatbotContainer() {
             setAlert({ title: showAllChatbotsData.error, type: 'error' });
             setLoad({ show: false });
         }
-    }, [showAllChatbotsData]);
+    }, [getChatbotLoading]);
 
 
     const handleDeleteChatbot = useCallback(async (chatbot_id: string) => {
