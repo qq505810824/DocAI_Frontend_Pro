@@ -51,13 +51,11 @@ function ExtractionDetailView(props: ExtractionDetailViewProps) {
     const [name, setName] = useState('');
     const handleSave = (chain_feature_ids: any) => {
         updateTagFeatureHandler(label?.id, chain_feature_ids);
-        console.log('chain_feature_ids', chain_feature_ids);
+        // console.log('chain_feature_ids', chain_feature_ids);
     };
 
     useEffect(() => {
         if (label) {
-            console.log(label);
-
             set_chain_feature_ids(label?.meta?.chain_features || []);
             setName(label.name);
         }

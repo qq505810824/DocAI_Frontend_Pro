@@ -291,7 +291,6 @@ export const upload = (options: any, isPublicAPI?: boolean, url?: string, search
   })
 }
 
-
 // base request
 export const request = <T>(url: string, options = {}, otherOptions?: IOtherOptions) => {
   return baseFetch<T>(url, options, otherOptions || {})

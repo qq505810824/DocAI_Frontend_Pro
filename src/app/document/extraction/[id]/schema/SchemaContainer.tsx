@@ -3,12 +3,14 @@
 import useAxios from 'axios-hooks';
 import _ from 'lodash';
 import { useRouter, useSearchParams, useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Api from '../../../../../apis';
 import useAlert from '../../../../../hooks/useAlert';
 import SchemaView from './SchemaView';
 
-const apiSetting = new Api();
+import useSWR from 'swr';
+import { postAction, putAction } from '../../../../../swr/common'
+import { getTagByIdFetcher, getSmartExtractionSchemasByIdFetcher } from '../../../../../swr/label'
 
 export default function SchemaContainer() {
     const router = useRouter();
@@ -27,45 +29,72 @@ export default function SchemaContainer() {
     const [visableAdd, setVisableAdd] = useState(true);
     const [label, setLabel] = useState();
 
-    const [{ data: getTagByIdData, loading: getTagByIdLoading }, getTagById] = useAxios(
-        apiSetting.Tag.getTagById(''),
-        {
-            manual: true
+
+    const getTagById = async (id: string) => {
+        try {
+            const res = await getTagByIdFetcher(id)
+            if (res && res.success) {
+                setLabel(res.tag);
+            }
+        } catch (e) { }
+    }
+
+    const getSmartExtractionSchemasById = useCallback(async (id: string) => {
+        setOpen(true);
+        try {
+            const res = await getSmartExtractionSchemasByIdFetcher(id)
+            if (res && res.success)
+                setExtractSchema({
+                    name: res.smart_extraction_schema?.name,
+                    description: res.smart_extraction_schema?.description,
+                    label_id: res.smart_extraction_schema?.label_id,
+                    schema: res.smart_extraction_schema?.schema,
+                    data_schema: res.smart_extraction_schema?.data_schema
+                });
+        } finally {
+            setOpen(false);
         }
-    );
+    }, [getSmartExtractionSchemasByIdFetcher])
 
-    const [
-        { data: getSmartExtractionSchemasByIdData, loading: getLoading },
-        getSmartExtractionSchemasById
-    ] = useAxios(apiSetting.SmartExtractionSchemas.getSmartExtractionSchemasById(''), {
-        manual: true
-    });
-
-    const [{ data: createSmartExtractionSchemasData, loading }, createSmartExtractionSchemas] =
-        useAxios(apiSetting.SmartExtractionSchemas.createSmartExtractionSchemas(), {
-            manual: true
-        });
-
-    const [
-        { data: updateSmartExtractionSchemasByIdData, loading: updateLoading },
-        updateSmartExtractionSchemasById
-    ] = useAxios(apiSetting.SmartExtractionSchemas.updateSmartExtractionSchemasById(''), {
-        manual: true
-    });
-
-    useEffect(() => {
-        if (getTagByIdData && getTagByIdData.success) {
-            setLabel(getTagByIdData.tag);
+    const createSmartExtractionSchemas = useCallback(async (data: Record<string, any>) => {
+        setOpen(true);
+        try {
+            const res = await postAction({
+                url: `/api/v1/smart_extraction_schemas`,
+                data: data
+            })
+            if (res && res.success)
+                setAlert({ title: '創建成功', type: 'success' });
+        } catch (e) {
+            setAlert({ title: '創建失敗', type: 'error' });
+            console.log(e);
+        } finally {
+            setOpen(false);
         }
-    }, [getTagByIdData]);
+    }, [postAction])
+
+    const updateSmartExtractionSchemasById = useCallback(async (id: string, data: Record<string, any>) => {
+        setOpen(true);
+        try {
+            const res = await putAction({
+                url: `/api/v1/smart_extraction_schemas/${id}`,
+                data: data
+            })
+            if (res && res.success)
+                setAlert({ title: '保存成功', type: 'success' });
+        } catch (e) {
+            setAlert({ title: e as string, type: 'error' });
+            console.log(e);
+        } finally {
+            setOpen(false);
+        }
+    }, [putAction])
 
     useEffect(() => {
         setActionContent('正在加載數據');
         if (router && id) {
             console.log('id', id);
-            getTagById({
-                ...apiSetting.Tag.getTagById(id.toString())
-            });
+            getTagById(id as string);
             setExtractSchema({
                 ...extractSchema,
                 label_id: id.toString()
@@ -73,58 +102,9 @@ export default function SchemaContainer() {
         }
         if (router && searchParams.get('schema_id')) {
             // setVisableAdd(false);
-            getSmartExtractionSchemasById({
-                ...apiSetting.SmartExtractionSchemas.getSmartExtractionSchemasById(
-                    searchParams.get('schema_id') as string
-                )
-            });
+            getSmartExtractionSchemasById(searchParams.get('schema_id') as string);
         }
     }, [router]);
-
-    useEffect(() => {
-        setOpen(loading);
-    }, [loading]);
-
-    useEffect(() => {
-        setOpen(updateLoading);
-    }, [updateLoading]);
-
-    useEffect(() => {
-        setOpen(getLoading);
-    }, [getLoading]);
-
-    useEffect(() => {
-        if (createSmartExtractionSchemasData && createSmartExtractionSchemasData.success) {
-            setAlert({ title: '創建成功', type: 'success' });
-        } else if (createSmartExtractionSchemasData && !createSmartExtractionSchemasData.success) {
-            setAlert({ title: '創建失敗', type: 'error' });
-            console.log(createSmartExtractionSchemasData);
-        }
-    }, [createSmartExtractionSchemasData]);
-
-    useEffect(() => {
-        if (updateSmartExtractionSchemasByIdData && updateSmartExtractionSchemasByIdData.success) {
-            setAlert({ title: '保存成功', type: 'success' });
-        } else if (
-            updateSmartExtractionSchemasByIdData &&
-            !updateSmartExtractionSchemasByIdData.success
-        ) {
-            setAlert({ title: updateSmartExtractionSchemasByIdData.message, type: 'error' });
-            console.log(updateSmartExtractionSchemasByIdData);
-        }
-    }, [updateSmartExtractionSchemasByIdData]);
-
-    useEffect(() => {
-        if (getSmartExtractionSchemasByIdData && getSmartExtractionSchemasByIdData.success) {
-            setExtractSchema({
-                name: getSmartExtractionSchemasByIdData.smart_extraction_schema?.name,
-                description: getSmartExtractionSchemasByIdData.smart_extraction_schema?.description,
-                label_id: getSmartExtractionSchemasByIdData.smart_extraction_schema?.label_id,
-                schema: getSmartExtractionSchemasByIdData.smart_extraction_schema?.schema,
-                data_schema: getSmartExtractionSchemasByIdData.smart_extraction_schema?.data_schema
-            });
-        }
-    }, [getSmartExtractionSchemasByIdData]);
 
     const handleSave = () => {
         const data_schema: any = {};
@@ -138,31 +118,12 @@ export default function SchemaContainer() {
         }
         setActionContent('正在保存數據,等待時間較長，請耐心等候...');
         if (router && searchParams.get('schema_id')) {
-            // const isSame = _.isEqual(
-            //     getSmartExtractionSchemasByIdData.smart_extraction_schema.data_schema,
-            //     data_schema
-            // );
-            // if (isSame) {
-            //     const _extractSchema = _.omit(extractSchema, 'schema', 'data_schema');
-            //     // console.log(_extractSchema);
-            //     updateSmartExtractionSchemasById({
-            //         ...apiSetting.SmartExtractionSchemas.updateSmartExtractionSchemasById(
-            //             router.query.schema_id as string
-            //         ),
-            //         data: _extractSchema
-            //     });
-            // } else {
-            updateSmartExtractionSchemasById({
-                ...apiSetting.SmartExtractionSchemas.updateSmartExtractionSchemasById(
-                    searchParams.get('schema_id') as string
-                ),
-                data: extractSchema
-            });
-            // }
+            updateSmartExtractionSchemasById(
+                searchParams.get('schema_id') as string,
+                extractSchema
+            );
         } else {
-            createSmartExtractionSchemas({
-                data: extractSchema
-            });
+            createSmartExtractionSchemas(extractSchema);
         }
     };
 

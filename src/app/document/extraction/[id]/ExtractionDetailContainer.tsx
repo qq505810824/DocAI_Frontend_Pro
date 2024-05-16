@@ -1,23 +1,18 @@
 'use client';
-
-import useAxios from 'axios-hooks';
 import { useRouter, useParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
-import Api from '../../../../apis';
 import { getAllChainFeatureDatas } from '../../../../apis/AirtableChainFeature';
 import useAlert from '../../../../hooks/useAlert';
 import ExtractionDetailView from './ExtractionDetailView';
 
 import useSWR from 'swr';
-import { getTagByIdFetcher, getSmartExtractionSchemasByLabelFetcher, deleteAction, postAction, putAction, getAction } from '../../../../swr/common'
-
-const apiSetting = new Api();
+import { deleteAction, postAction, putAction, getAction } from '../../../../swr/common'
+import { getTagByIdFetcher, getSmartExtractionSchemasByLabelFetcher } from '../../../../swr/label'
 
 export default function ExtractionDetailContainer() {
     const router = useRouter();
     const { id } = useParams();
     const { setAlert } = useAlert();
-    const [open, setOpen] = useState(false);
     const [label, setLabel] = useState<any>();
     const [meta, setMeta] = useState();
     const [page, setPage] = useState(1);

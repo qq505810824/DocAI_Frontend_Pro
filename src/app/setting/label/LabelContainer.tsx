@@ -9,7 +9,8 @@ import LabelView from './LabelView';
 
 import useSWR, { mutate } from 'swr';
 import useSWRMutation from 'swr';
-import { getAction, postAction, getAllLabelsFetcher } from '../../../swr/common'
+import { getAction, postAction } from '../../../swr/common'
+import { getAllLabelsFetcher } from '../../../swr/label'
 
 
 const apiSetting = new Api();
