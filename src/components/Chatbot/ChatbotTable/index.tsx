@@ -54,12 +54,12 @@ export default function ChatbotTable(props: ViewProps) {
                 }}
             >
                 {chatbots &&
-                <Box>
-                    {chatbots.length == 0 ? (
-                        <LoaderView />
-                    ) : null}
-                    {chatbots.map((row, index) => (
-                        <Box key={index}>
+                    <Box>
+                        {chatbots.length == 0 ? (
+                            <LoaderView />
+                        ) : null}
+                        {chatbots.map((row, index) => (
+
                             <List
                                 key={row.chatbot.id}
                                 size="sm"
@@ -167,9 +167,8 @@ export default function ChatbotTable(props: ViewProps) {
                                 </ListItem>
                                 <ListDivider />
                             </List>
-                        </Box>
-                    ))}
-                </Box>
+                        ))}
+                    </Box>
                 }
             </Sheet>
             <Box

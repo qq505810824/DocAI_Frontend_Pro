@@ -7,9 +7,10 @@ export default class Chatbot {
     showAllChatbots(page: number) {
         const requestHeader: AxiosRequestConfig = {
             baseURL,
-            url: '/api/v1/chatbots',
+            url: `/api/v1/chatbots?page=${page}`,
+            // url: '/api/v1/chatbots',
             method: 'GET',
-            params: { page }
+            // params: { page }
         };
         return requestHeader;
     }

@@ -45,25 +45,29 @@ function ChatbotContainer() {
     const [meta, setMeta] = useState<any>();
     const [visibleQRcode, setVisibleQRcode] = useState(false);
     const [qrcodeContent, setQrcodeContent] = useState<any>();
+
     // const [
     //     { data: showAllChatbotsData, loading: showAllChatbotsLoading, error: showAllChatbotsError },
     //     getAllChatbots
     // ] = useAxios({}, { manual: true });
-    const { data: showAllChatbotsData, isLoading: getChatbotLoading }
-        = useSWR({ page: page }, getAllChatbotsFetcher)
 
+    const { data: showAllChatbotsData, isLoading: showAllChatbotsLoading }
+        = useSWR(`/api/v1/chatbots?page=${page}`, getAllChatbotsFetcher)
+
+        
     useEffect(() => {
         setLoad({ show: false });
+        // getAllChatbots(apiSetting.Chatbot.showAllChatbots(page));
     }, [page]);
 
     useEffect(() => {
         if (searchParams) {
-            setPage(parseInt(searchParams.get('page') || '1'));
+            setPage(parseInt(searchParams.get('page') || '2'));
         }
     }, [searchParams]);
 
     useEffect(() => {
-        if (!getChatbotLoading && showAllChatbotsData?.success) {
+        if (!showAllChatbotsLoading && showAllChatbotsData?.success) {
             setChatbots(showAllChatbotsData.chatbots);
             setMeta(showAllChatbotsData.meta);
             setLoad({ show: false });
@@ -71,7 +75,7 @@ function ChatbotContainer() {
             setAlert({ title: showAllChatbotsData.error, type: 'error' });
             setLoad({ show: false });
         }
-    }, [getChatbotLoading]);
+    }, [showAllChatbotsLoading]);
 
 
     const handleDeleteChatbot = useCallback(async (chatbot_id: string) => {

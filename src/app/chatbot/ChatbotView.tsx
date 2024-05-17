@@ -10,6 +10,12 @@ import { Box, Breadcrumbs, Button, Link, Typography } from '@mui/joy';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Chatbot, Chatbots } from './ChatbotContainer';
+
+import useSWRInfinite from 'swr/infinite'
+import { getAllChatbotsFetcher } from '../../swr/chatbot'
+import useSWR from 'swr'
+import { getAction } from '@/swr/common';
+
 interface ViewProps {
     chatbots: Chatbots[];
     meta: any;
@@ -19,6 +25,8 @@ interface ViewProps {
     visibleQRcode: boolean;
     setVisibleQRcode: any;
 }
+
+const fetcher = (url: any) => fetch(url).then((res) => res.json());
 
 function ChatbotView(props: ViewProps) {
     const {
@@ -34,6 +42,28 @@ function ChatbotView(props: ViewProps) {
     const router = useRouter();
     const [visibleDelete, setVisibleDelete] = useState(false);
     const [currectChabot, setCurrectChabot] = useState<Chatbot>();
+
+
+    const {
+        data,
+        mutate,
+        size,
+        setSize,
+        isValidating,
+        isLoading } = useSWRInfinite(
+            (index) => { return `/api/v1/chatbots?page=${index + 1}` }
+            , getAllChatbotsFetcher)
+
+    const chatbotArray = data?.map(obj => obj.chatbots)
+    const metaArray = data?.map(obj => obj.meta)
+    const issues = chatbotArray ? ([] as Chatbots[]).concat.apply([], chatbotArray) : [];
+    const lastMeta = metaArray ? metaArray[-1] : [];
+
+    // const isLoadingMore =
+    //     isLoading || (size > 0 && data && typeof data[size - 1] === "undefined");
+    // const isEmpty = data?.[0]?.length === 0;
+    // const isReachingEnd =
+    //     isEmpty || (data && data[data.length - 1]?.length < PAGE_SIZE);
 
     return (
         <>
@@ -77,10 +107,10 @@ function ChatbotView(props: ViewProps) {
                     新增助手
                 </Button>
             </Box>
-            <SearchInputView handleSearch={() => {}} />
+            <SearchInputView handleSearch={() => { }} />
             <ChatbotTable
-                chatbots={chatbots}
-                meta={meta}
+                chatbots={issues}
+                meta={lastMeta}
                 handleDeleteChatbot={(chatbot: any) => {
                     setCurrectChabot(chatbot);
                     setVisibleDelete(true);
@@ -88,14 +118,38 @@ function ChatbotView(props: ViewProps) {
                 handleShare={handleShare}
             />
             <ChatbotList
-                chatbots={chatbots}
-                meta={meta}
+                chatbots={issues}
+                meta={lastMeta}
                 handleDeleteChatbot={(chatbot: any) => {
                     setCurrectChabot(chatbot);
                     setVisibleDelete(true);
                 }}
                 handleShare={handleShare}
             />
+            {/* <Box
+                className="Pagination-mobile"
+                sx={{ display: { xs: 'flex', md: 'flex' }, alignItems: 'center', py: 2 }}
+            >
+                showing {size} page(s) of {isLoadingMore ? "..." : issues.length}{" "}
+                issue(s){" "}
+                <Button
+                    color="primary"
+                    startDecorator={<AddIcon />}
+                    size="sm"
+                    // disabled={isLoadingMore || isReachingEnd}
+                    onClick={() => {
+                        console.log('size————————————', size)
+                        setSize(size + 1)
+                    }}
+                >
+                    Size+1
+                    {isLoadingMore
+                        ? "loading..."
+                        : isReachingEnd
+                            ? "no more issues"
+                            : "load more"}
+                </Button>
+            </Box> */}
 
             <ShareQRcodeModal
                 visable={visibleQRcode}

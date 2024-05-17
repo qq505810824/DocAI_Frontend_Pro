@@ -35,10 +35,13 @@ type sharePromise = {
 }
 
 
-// label
-export const getAllChatbotsFetcher: Fetcher<AllChatbotsResponse, { page: string }> = (page) => {
-  return get<AllChatbotsResponse>(`/api/v1/chatbots`, { page })
+// export const getAllChatbotsFetcher: Fetcher<AllChatbotsResponse, { page: number }> = ({ page }) => {
+//   return get<AllChatbotsResponse>(`/api/v1/chatbots?page=${page}`)
+// }
+export const getAllChatbotsFetcher: Fetcher<AllChatbotsResponse,string> = (url) => {
+  return get<AllChatbotsResponse>(url)
 }
+
 
 export const shareAuction = async (url: string) => {
   return post(url) as Promise<sharePromise>
