@@ -7,6 +7,7 @@ import PollOutlinedIcon from '@mui/icons-material/PollOutlined';
 import { Chip, Stack } from '@mui/joy';
 import Avatar from '@mui/joy/Avatar';
 import Box from '@mui/joy/Box';
+import Button from '@mui/joy/Button';
 import { iconButtonClasses } from '@mui/joy/IconButton';
 import Link from '@mui/joy/Link';
 import List from '@mui/joy/List';
@@ -20,17 +21,24 @@ import { useRouter } from 'next/navigation';
 import * as React from 'react';
 import LoaderView from '../LoaderView';
 import Dropdowns from '../feature/Dropdowns';
+import { useState, useEffect, useRef } from 'react';
 
 interface ViewProps {
     chatbots: Chatbots[];
     meta: any;
     handleDeleteChatbot: any;
     handleShare: any;
+    setSize: any;
+    size: number;
+    isLoadingMore: boolean | undefined;
+    isReachingEnd: boolean | undefined;
 }
 
 export default function ChatbotTable(props: ViewProps) {
-    const { chatbots, meta, handleDeleteChatbot, handleShare } = props;
+    const { chatbots, meta, handleDeleteChatbot, handleShare, setSize, size, isLoadingMore, isReachingEnd } = props;
     const router = useRouter();
+    const [page, setPage] = useState(1);
+    const containerRef = useRef<HTMLDivElement | null>(null);; // 容器元素的引用
 
     const getFeatureNames = (selected_features: any) => {
         if (!selected_features) return [];
@@ -38,6 +46,8 @@ export default function ChatbotTable(props: ViewProps) {
             (feature) => feature.name
         );
     };
+
+
     return (
         <React.Fragment>
             <Sheet
@@ -59,7 +69,6 @@ export default function ChatbotTable(props: ViewProps) {
                             <LoaderView />
                         ) : null}
                         {chatbots.map((row, index) => (
-
                             <List
                                 key={row.chatbot.id}
                                 size="sm"
@@ -168,6 +177,24 @@ export default function ChatbotTable(props: ViewProps) {
                                 <ListDivider />
                             </List>
                         ))}
+                        <List>
+                            <Button
+                                color="primary"
+                                // startDecorator={<AddIcon />}
+                                size="sm"
+                                disabled={isLoadingMore || isReachingEnd}
+                                onClick={() => {
+                                    console.log('size————————————', size)
+                                    setSize(size + 1)
+                                }}
+                            >
+                                {isLoadingMore
+                                    ? "Loading..."
+                                    : isReachingEnd
+                                        ? "No more chatbot"
+                                        : "Load More"}
+                            </Button>
+                        </List>
                     </Box>
                 }
             </Sheet>

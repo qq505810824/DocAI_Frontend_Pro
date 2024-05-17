@@ -10,6 +10,7 @@ import { Box, Breadcrumbs, Button, Link, Typography } from '@mui/joy';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Chatbot, Chatbots } from './ChatbotContainer';
+import PaginationView from '@/components/common/Widget/PaginationView';
 
 import useSWRInfinite from 'swr/infinite'
 import { getAllChatbotsFetcher } from '../../swr/chatbot'
@@ -59,11 +60,11 @@ function ChatbotView(props: ViewProps) {
     const issues = chatbotArray ? ([] as Chatbots[]).concat.apply([], chatbotArray) : [];
     const lastMeta = metaArray ? metaArray[-1] : [];
 
-    // const isLoadingMore =
-    //     isLoading || (size > 0 && data && typeof data[size - 1] === "undefined");
-    // const isEmpty = data?.[0]?.length === 0;
-    // const isReachingEnd =
-    //     isEmpty || (data && data[data.length - 1]?.length < PAGE_SIZE);
+    const isLoadingMore =
+        isLoading || (size > 0 && data && typeof data[size - 1] === "undefined");
+    const isEmpty = chatbotArray?.[0]?.length === 0;
+    const isReachingEnd =
+        isEmpty || (chatbotArray && chatbotArray[chatbotArray.length - 1]?.length < 40);
 
     return (
         <>
@@ -116,6 +117,10 @@ function ChatbotView(props: ViewProps) {
                     setVisibleDelete(true);
                 }}
                 handleShare={handleShare}
+                setSize={setSize}
+                size={size}
+                isLoadingMore={isLoadingMore}
+                isReachingEnd={isReachingEnd}
             />
             <ChatbotList
                 chatbots={issues}
@@ -125,31 +130,11 @@ function ChatbotView(props: ViewProps) {
                     setVisibleDelete(true);
                 }}
                 handleShare={handleShare}
+                setSize={setSize}
+                size={size}
+                isLoadingMore={isLoadingMore}
+                isReachingEnd={isReachingEnd}
             />
-            {/* <Box
-                className="Pagination-mobile"
-                sx={{ display: { xs: 'flex', md: 'flex' }, alignItems: 'center', py: 2 }}
-            >
-                showing {size} page(s) of {isLoadingMore ? "..." : issues.length}{" "}
-                issue(s){" "}
-                <Button
-                    color="primary"
-                    startDecorator={<AddIcon />}
-                    size="sm"
-                    // disabled={isLoadingMore || isReachingEnd}
-                    onClick={() => {
-                        console.log('size————————————', size)
-                        setSize(size + 1)
-                    }}
-                >
-                    Size+1
-                    {isLoadingMore
-                        ? "loading..."
-                        : isReachingEnd
-                            ? "no more issues"
-                            : "load more"}
-                </Button>
-            </Box> */}
 
             <ShareQRcodeModal
                 visable={visibleQRcode}

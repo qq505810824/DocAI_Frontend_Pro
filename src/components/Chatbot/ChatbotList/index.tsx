@@ -23,37 +23,19 @@ interface ViewProps {
     meta: any;
     handleDeleteChatbot: any;
     handleShare: any;
+    setSize: any;
+    size: number;
+    isLoadingMore: boolean | undefined;
+    isReachingEnd: boolean | undefined;
 }
 
 export default function ChatbotList(props: ViewProps) {
-    const { chatbots, meta, handleDeleteChatbot, handleShare } = props;
+    const { chatbots, meta, handleDeleteChatbot, handleShare, setSize, size, isLoadingMore, isReachingEnd } = props;
     const router = useRouter();
-
-    const {
-        data,
-        mutate,
-        size,
-        setSize,
-        isValidating,
-        isLoading } = useSWRInfinite(
-            (index) => { return `/api/v1/chatbots?page=${index + 1}` }
-            , getAllChatbotsFetcher)
-
-    const chatbotArray = data?.map(obj => obj.chatbots)
-    const metaArray = data?.map(obj => obj.meta)
-    const bots = chatbotArray ? ([] as Chatbots[]).concat.apply([], chatbotArray) : [];
-    const lastMeta = metaArray ? metaArray[-1] : '';
-
-    console.log(bots, lastMeta)
-    // const isLoadingMore =
-    //     isLoading || (size > 0 && data && typeof data[size - 1] === "undefined");
-    // const isEmpty = data?.[0]?.length === 0;
-    // const isReachingEnd =
-    //     isEmpty || (data && data[data.length - 1]?.length < PAGE_SIZE);
 
     return (
         <>
-            <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
+            <Box sx={{ display: { xs: 'block', sm: 'none' } }} >
                 {chatbots.map((listItem) => (
                     <List
                         key={listItem.chatbot.id}
@@ -141,37 +123,28 @@ export default function ChatbotList(props: ViewProps) {
                                 </div>
                             </ListItemContent>
                         </ListItem>
-                        {/* <ListDivider /> */}
+                        <ListDivider />
                     </List>
                 ))}
                 <List>
-                    <ListItem>
-                        <ListItemContent>
-                            h????
-
-                        </ListItemContent>
-                    </ListItem>
+                    <Button
+                        color="primary"
+                        // startDecorator={<AddIcon />}
+                        size="sm"
+                        disabled={isLoadingMore || isReachingEnd}
+                        onClick={() => { setSize(size + 1) }}
+                    >
+                        {isLoadingMore
+                            ? "Loading..."
+                            : isReachingEnd
+                                ? "No more chatbot"
+                                : "Load More"}
+                    </Button>
                 </List>
             </Box>
             <Box
-            // sx={{ display: { xs: 'flex', md: 'flex' }, alignItems: 'center', py: 2 }}
+                sx={{ display: { xs: 'flex', md: 'none' }, alignItems: 'center', py: 2 }}
             >
-                <Button
-                    color="primary"
-                    // startDecorator={<AddIcon />}
-                    size="sm"
-                    // disabled={isLoadingMore || isReachingEnd}
-                    onClick={() => {
-                        setSize(size + 1)
-                    }}
-                >
-                    Size+1
-                    {/* {isLoadingMore
-                        ? "loading..."
-                        : isReachingEnd
-                            ? "no more issues"
-                            : "load more"} */}
-                </Button>
 
                 <PaginationView meta={meta} pathname={'/chatbot'} params={null} />
             </Box>
