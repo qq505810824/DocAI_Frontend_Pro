@@ -28,17 +28,12 @@ interface ViewProps {
     meta: any;
     handleDeleteChatbot: any;
     handleShare: any;
-    setSize: any;
-    size: number;
-    isLoadingMore: boolean | undefined;
-    isReachingEnd: boolean | undefined;
+    anchorRef: any;
 }
 
 export default function ChatbotTable(props: ViewProps) {
-    const { chatbots, meta, handleDeleteChatbot, handleShare, setSize, size, isLoadingMore, isReachingEnd } = props;
+    const { chatbots, meta, handleDeleteChatbot, handleShare, anchorRef } = props;
     const router = useRouter();
-    const [page, setPage] = useState(1);
-    const containerRef = useRef<HTMLDivElement | null>(null);; // 容器元素的引用
 
     const getFeatureNames = (selected_features: any) => {
         if (!selected_features) return [];
@@ -177,24 +172,24 @@ export default function ChatbotTable(props: ViewProps) {
                                 <ListDivider />
                             </List>
                         ))}
-                        <List>
+                        <div ref={anchorRef}>
                             <Button
                                 color="primary"
                                 // startDecorator={<AddIcon />}
                                 size="sm"
-                                disabled={isLoadingMore || isReachingEnd}
+                                // disabled={isLoadingMore || isReachingEnd}
                                 onClick={() => {
-                                    console.log('size————————————', size)
-                                    setSize(size + 1)
+                                    // setSize(size + 1)
                                 }}
                             >
-                                {isLoadingMore
+                                Load
+                                {/* {isLoadingMore
                                     ? "Loading..."
                                     : isReachingEnd
                                         ? "No more chatbot"
-                                        : "Load More"}
+                                        : "Load More"} */}
                             </Button>
-                        </List>
+                        </div>
                     </Box>
                 }
             </Sheet>

@@ -6,16 +6,14 @@ import useLoad from '@/hooks/useLoad';
 import { encrypt } from '@/utils/util_crypto';
 import useAxios from 'axios-hooks';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import ChatbotView from './ChatbotView';
 
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite'
 import { deleteAction } from '../../swr/common'
-import { getAllChatbotsFetcher, shareAuction } from '../../swr/chatbot'
-
-
-const apiSetting = new Api();
+import { getAllChatbotsFetcher, getChatbotsFetcher, shareAuction, getKey } from '../../swr/chatbot'
+import type { AllChatbotsResponse } from '../../swr/chatbot'
 
 export interface Chatbots {
     chatbot: Chatbot;
@@ -41,20 +39,49 @@ function ChatbotContainer() {
     const { setLoad } = useLoad();
     const searchParams = useSearchParams();
     const [page, setPage] = useState(1);
-    const [chatbots, setChatbots] = useState<Chatbots[]>([]);
+    // const [chatbots, setChatbots] = useState<Chatbots[]>([]);
     const [meta, setMeta] = useState<any>();
     const [visibleQRcode, setVisibleQRcode] = useState(false);
     const [qrcodeContent, setQrcodeContent] = useState<any>();
+    const [searchKeywords, setSearchKeywords] = useState('')
 
-    // const [
-    //     { data: showAllChatbotsData, loading: showAllChatbotsLoading, error: showAllChatbotsError },
-    //     getAllChatbots
-    // ] = useAxios({}, { manual: true });
+    // const setKeywords = useCallback((keywords: string) => {
+    //     setQuery(prev => ({ ...prev, keywords }))
+    //   }, [setQuery])
+
+    //dify的无限加载，修改：
+    const { data: chatbots, isLoading, size, setSize, mutate } = useSWRInfinite(
+        (pageIndex: number, previousPageData: AllChatbotsResponse) => {
+            console.log('SWR中的page：', pageIndex)
+            const url = getKey(pageIndex, previousPageData, searchKeywords)
+            return url
+        },
+        getChatbotsFetcher,
+        // { revalidateFirstPage: true },
+    )
+    const anchorRef = useRef<HTMLDivElement>(null)
+    const hasMore = chatbots?.at(-1)?.has_more ?? true
+    useEffect(() => {
+        let observer: IntersectionObserver | undefined
+        if (anchorRef.current) {
+            observer = new IntersectionObserver((entries) => {
+                console.log('条件判定：', entries[0].isIntersecting, !isLoading, hasMore)
+                if (entries[0].isIntersecting && !isLoading && hasMore)
+                    setSize((size: number) => size + 1)
+            }, { rootMargin: '100px' })
+            observer.observe(anchorRef.current)
+        }
+        return () => observer?.disconnect()
+        //组件卸载或者不再需要观察元素时，调用该函数来断开 IntersectionObserver 的连接。
+        //如果 observer 存在，那么调用 disconnect() 方法来断开观察器与目标元素之间的连接。
+    }, [isLoading, setSize, anchorRef, mutate, hasMore])
+
+
 
     const { data: showAllChatbotsData, isLoading: showAllChatbotsLoading }
         = useSWR(`/api/v1/chatbots?page=${page}`, getAllChatbotsFetcher)
 
-        
+
     useEffect(() => {
         setLoad({ show: false });
         // getAllChatbots(apiSetting.Chatbot.showAllChatbots(page));
@@ -68,7 +95,7 @@ function ChatbotContainer() {
 
     useEffect(() => {
         if (!showAllChatbotsLoading && showAllChatbotsData?.success) {
-            setChatbots(showAllChatbotsData.chatbots);
+            // setChatbots(showAllChatbotsData.chatbots);
             setMeta(showAllChatbotsData.meta);
             setLoad({ show: false });
         } else if (showAllChatbotsData && !showAllChatbotsData?.success) {
@@ -128,12 +155,12 @@ function ChatbotContainer() {
         <ChatbotView
             {...{
                 chatbots,
-                meta,
                 handleDeleteChatbot,
                 handleShare,
                 qrcodeContent,
                 visibleQRcode,
-                setVisibleQRcode
+                setVisibleQRcode,
+                anchorRef
             }}
         />
     );

@@ -4,11 +4,12 @@ import type { Fetcher } from 'swr'
 import axios from 'axios';
 
 //类型断言
-type AllChatbotsResponse = {
+export type AllChatbotsResponse = {
+  chatbots: Chatbots[];
   success: boolean;
   error: string;
   meta: any;
-  chatbots: Chatbots[]
+  has_more: boolean;
 }
 
 type Chatbots = {
@@ -29,16 +30,41 @@ type Chatbot = {
   updated_at: string;
 }
 type sharePromise = {
-  success: boolean;
   chatbot: any;
+  success: boolean;
   signature: string
 }
 
+export const getKey = (
+  pageIndex: number,
+  previousPageData: AllChatbotsResponse,
+  // activeTab: string,
+  // tags: string[],
+  keywords: string,
+) => {
+  if (!pageIndex || previousPageData.has_more) {
+    // const params: any = { url: url, params: { page: pageIndex + 1, limit: 30, name: keywords } }
+    const params: any = { url: '/api/v1/chatbots', params: { page: pageIndex + 1, limit: 30, name: keywords } }
 
-// export const getAllChatbotsFetcher: Fetcher<AllChatbotsResponse, { page: number }> = ({ page }) => {
-//   return get<AllChatbotsResponse>(`/api/v1/chatbots?page=${page}`)
-// }
-export const getAllChatbotsFetcher: Fetcher<AllChatbotsResponse,string> = (url) => {
+    // if (activeTab !== 'all')
+    //   params.params.mode = activeTab
+    // else
+    //   delete params.params.mode
+
+    // if (tags.length)
+    //   params.params.tag_ids = tags
+
+    return params
+  }
+  return null
+}
+
+export const getChatbotsFetcher: Fetcher<AllChatbotsResponse, { url: string; params?: Record<string, any> }> = ({ url, params }) => {
+  return get<AllChatbotsResponse>(url, { params })
+}
+
+
+export const getAllChatbotsFetcher: Fetcher<AllChatbotsResponse, string> = (url) => {
   return get<AllChatbotsResponse>(url)
 }
 

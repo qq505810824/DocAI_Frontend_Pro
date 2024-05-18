@@ -23,14 +23,11 @@ interface ViewProps {
     meta: any;
     handleDeleteChatbot: any;
     handleShare: any;
-    setSize: any;
-    size: number;
-    isLoadingMore: boolean | undefined;
-    isReachingEnd: boolean | undefined;
+    anchorRef: any;
 }
 
 export default function ChatbotList(props: ViewProps) {
-    const { chatbots, meta, handleDeleteChatbot, handleShare, setSize, size, isLoadingMore, isReachingEnd } = props;
+    const { chatbots, meta, handleDeleteChatbot, handleShare, anchorRef } = props;
     const router = useRouter();
 
     return (
@@ -126,21 +123,22 @@ export default function ChatbotList(props: ViewProps) {
                         <ListDivider />
                     </List>
                 ))}
-                <List>
+                <div ref={anchorRef}>
+
                     <Button
                         color="primary"
                         // startDecorator={<AddIcon />}
                         size="sm"
-                        disabled={isLoadingMore || isReachingEnd}
-                        onClick={() => { setSize(size + 1) }}
+                        // disabled={isLoadingMore || isReachingEnd}
                     >
-                        {isLoadingMore
+                        Load
+                        {/* {isLoadingMore
                             ? "Loading..."
                             : isReachingEnd
                                 ? "No more chatbot"
-                                : "Load More"}
+                                : "Load More"} */}
                     </Button>
-                </List>
+                </div>
             </Box>
             <Box
                 sx={{ display: { xs: 'flex', md: 'none' }, alignItems: 'center', py: 2 }}
