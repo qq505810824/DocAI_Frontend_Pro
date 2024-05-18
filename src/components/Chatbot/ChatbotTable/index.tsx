@@ -44,7 +44,8 @@ export default function ChatbotTable(props: ViewProps) {
 
 
     return (
-        <React.Fragment>
+        // <React.Fragment>
+        <>
             <Sheet
                 className="OrderTableContainer"
                 variant="outlined"
@@ -53,145 +54,124 @@ export default function ChatbotTable(props: ViewProps) {
                     width: '100%',
                     borderRadius: 'sm',
                     flexShrink: 1,
-                    overflow: 'auto',
+                    // overflow: 'auto',
                     padding: 2,
-                    minHeight: 0
+                    // minHeight: 0 //解决容器塌陷的问题
                 }}
             >
-                {chatbots &&
-                    <Box>
-                        {chatbots.length == 0 ? (
-                            <LoaderView />
-                        ) : null}
-                        {chatbots.map((row, index) => (
-                            <List
-                                key={row.chatbot.id}
-                                size="sm"
+                {chatbots.length == 0 ? (
+                    <LoaderView />
+                ) : null}
+                {chatbots.map((row, index) => (
+                    <List
+                        key={row.chatbot.id}
+                        size="sm"
+                        sx={{
+                            '--ListItem-paddingX': 0
+                        }}
+                    >
+                        <ListItem
+                            sx={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'start'
+                            }}
+                        >
+                            <ListItemContent
                                 sx={{
-                                    '--ListItem-paddingX': 0
+                                    display: 'flex',
+                                    gap: 2,
+                                    alignItems: 'start',
+                                    justifyContent: 'space-between'
                                 }}
                             >
-                                <ListItem
+                                <Box sx={{ display: 'flex', gap: 2 }}>
+                                    <ListItemDecorator>
+                                        <Avatar size="sm">
+                                            {row.chatbot.name.substring(0, 1)}
+                                        </Avatar>
+                                    </ListItemDecorator>
+                                    <div>
+                                        <Box sx={{ display: 'flex', gap: 1 }}>
+                                            <Typography level="body-sm">
+                                                <Link
+                                                    level="title-sm"
+                                                    sx={{
+                                                        fontWeight: 'bold',
+                                                        color: 'black'
+                                                    }}
+                                                >
+                                                    <Typography
+                                                        onClick={() => {
+                                                            handleShare(row.chatbot, true);
+                                                        }}
+                                                    >
+                                                        {row.chatbot.name}
+                                                    </Typography>
+                                                </Link>
+                                            </Typography>
+                                            <Stack direction="row" spacing={1}>
+                                                {getFeatureNames(
+                                                    row.chatbot.meta?.selected_features
+                                                )?.map((name, index) => (
+                                                    <Chip
+                                                        key={index}
+                                                        color="primary"
+                                                        variant="soft"
+                                                        size="sm"
+                                                    >
+                                                        {name}
+                                                    </Chip>
+                                                ))}
+                                            </Stack>
+                                        </Box>
+                                        <Typography level="body-xs" gutterBottom>
+                                            {row.chatbot.description}
+                                        </Typography>
+                                    </div>
+                                </Box>
+                                <Box
                                     sx={{
                                         display: 'flex',
-                                        justifyContent: 'space-between',
-                                        alignItems: 'start'
+                                        alignItems: 'center',
+                                        gap: 1,
+                                        mb: 1
                                     }}
                                 >
-                                    <ListItemContent
-                                        sx={{
-                                            display: 'flex',
-                                            gap: 2,
-                                            alignItems: 'start',
-                                            justifyContent: 'space-between'
+                                    <Chip
+                                        variant="soft"
+                                        startDecorator={<PollOutlinedIcon />}
+                                        onClick={() => {
+                                            router.push('/chatbot/data');
                                         }}
                                     >
-                                        <Box sx={{ display: 'flex', gap: 2 }}>
-                                            <ListItemDecorator>
-                                                <Avatar size="sm">
-                                                    {row.chatbot.name.substring(0, 1)}
-                                                </Avatar>
-                                            </ListItemDecorator>
-                                            <div>
-                                                <Box sx={{ display: 'flex', gap: 1 }}>
-                                                    <Typography level="body-sm">
-                                                        <Link
-                                                            level="title-sm"
-                                                            sx={{
-                                                                fontWeight: 'bold',
-                                                                color: 'black'
-                                                            }}
-                                                        >
-                                                            <Typography
-                                                                onClick={() => {
-                                                                    handleShare(row.chatbot, true);
-                                                                }}
-                                                            >
-                                                                {row.chatbot.name}
-                                                            </Typography>
-                                                        </Link>
-                                                    </Typography>
-                                                    <Stack direction="row" spacing={1}>
-                                                        {getFeatureNames(
-                                                            row.chatbot.meta?.selected_features
-                                                        )?.map((name, index) => (
-                                                            <Chip
-                                                                key={index}
-                                                                color="primary"
-                                                                variant="soft"
-                                                                size="sm"
-                                                            >
-                                                                {name}
-                                                            </Chip>
-                                                        ))}
-                                                    </Stack>
-                                                </Box>
-                                                <Typography level="body-xs" gutterBottom>
-                                                    {row.chatbot.description}
-                                                </Typography>
-                                            </div>
-                                        </Box>
-                                        <Box
-                                            sx={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: 1,
-                                                mb: 1
-                                            }}
-                                        >
-                                            <Chip
-                                                variant="soft"
-                                                startDecorator={<PollOutlinedIcon />}
-                                                onClick={() => {
-                                                    router.push('/chatbot/data');
-                                                }}
-                                            >
-                                                {'View Data'}
-                                            </Chip>
-                                            <Dropdowns
-                                                share={() => {
-                                                    handleShare(row.chatbot);
-                                                }}
-                                                edit={() => {
-                                                    router.push(
-                                                        `/chatbot/edit?id=${row.chatbot?.id}`
-                                                    );
-                                                }}
-                                                editQuesion={() => {
-                                                    router.push(
-                                                        `/chatbot/${row.chatbot?.id}/assistive_question`
-                                                    );
-                                                }}
-                                                remove={() => {
-                                                    handleDeleteChatbot(row.chatbot);
-                                                }}
-                                            />
-                                        </Box>
-                                    </ListItemContent>
-                                </ListItem>
-                                <ListDivider />
-                            </List>
-                        ))}
-                        <div ref={anchorRef}>
-                            <Button
-                                color="primary"
-                                // startDecorator={<AddIcon />}
-                                size="sm"
-                                // disabled={isLoadingMore || isReachingEnd}
-                                onClick={() => {
-                                    // setSize(size + 1)
-                                }}
-                            >
-                                Load
-                                {/* {isLoadingMore
-                                    ? "Loading..."
-                                    : isReachingEnd
-                                        ? "No more chatbot"
-                                        : "Load More"} */}
-                            </Button>
-                        </div>
-                    </Box>
-                }
+                                        {'View Data'}
+                                    </Chip>
+                                    <Dropdowns
+                                        share={() => {
+                                            handleShare(row.chatbot);
+                                        }}
+                                        edit={() => {
+                                            router.push(
+                                                `/chatbot/edit?id=${row.chatbot?.id}`
+                                            );
+                                        }}
+                                        editQuesion={() => {
+                                            router.push(
+                                                `/chatbot/${row.chatbot?.id}/assistive_question`
+                                            );
+                                        }}
+                                        remove={() => {
+                                            handleDeleteChatbot(row.chatbot);
+                                        }}
+                                    />
+                                </Box>
+                            </ListItemContent>
+                        </ListItem>
+                        <ListDivider />
+                    </List>
+                ))}
+                <div ref={anchorRef}></div>
             </Sheet>
             <Box
                 className="Pagination-laptopUp"
@@ -207,6 +187,7 @@ export default function ChatbotTable(props: ViewProps) {
             >
                 <PaginationView meta={meta} pathname={'/chatbot'} params={null} />
             </Box>
-        </React.Fragment>
+        </>
+        // </React.Fragment>
     );
 }

@@ -39,7 +39,7 @@ function ChatbotContainer() {
     const { setLoad } = useLoad();
     const searchParams = useSearchParams();
     const [page, setPage] = useState(1);
-    // const [chatbots, setChatbots] = useState<Chatbots[]>([]);
+    const [chatbots, setChatbots] = useState<Chatbots[]>([]);
     const [meta, setMeta] = useState<any>();
     const [visibleQRcode, setVisibleQRcode] = useState(false);
     const [qrcodeContent, setQrcodeContent] = useState<any>();
@@ -50,22 +50,21 @@ function ChatbotContainer() {
     //   }, [setQuery])
 
     //dify的无限加载，修改：
-    const { data: chatbots, isLoading, size, setSize, mutate } = useSWRInfinite(
-        (pageIndex: number, previousPageData: AllChatbotsResponse) => {
-            console.log('SWR中的page：', pageIndex)
-            const url = getKey(pageIndex, previousPageData, searchKeywords)
-            return url
-        },
+    const { data: showAllChatbotsData, isLoading, setSize, mutate } = useSWRInfinite(
+        (pageIndex: number, previousPageData: AllChatbotsResponse) => getKey(pageIndex, previousPageData, searchKeywords),
         getChatbotsFetcher,
-        // { revalidateFirstPage: true },
+        { revalidateFirstPage: true },
     )
     const anchorRef = useRef<HTMLDivElement>(null)
-    const hasMore = chatbots?.at(-1)?.has_more ?? true
+    const hasMore = showAllChatbotsData?.at(-1)?.meta.next_page != null ?? true
+    // const hasMore = showAllChatbotsData?.at(-1)?.meta.current_page <= showAllChatbotsData?.at(-1)?.meta.total_pages ?? true
+    // const hasMore = showAllChatbotsData?.at(-1)?.has_more ?? true
     useEffect(() => {
         let observer: IntersectionObserver | undefined
         if (anchorRef.current) {
             observer = new IntersectionObserver((entries) => {
                 console.log('条件判定：', entries[0].isIntersecting, !isLoading, hasMore)
+                console.log('观测', entries[0])
                 if (entries[0].isIntersecting && !isLoading && hasMore)
                     setSize((size: number) => size + 1)
             }, { rootMargin: '100px' })
@@ -76,10 +75,17 @@ function ChatbotContainer() {
         //如果 observer 存在，那么调用 disconnect() 方法来断开观察器与目标元素之间的连接。
     }, [isLoading, setSize, anchorRef, mutate, hasMore])
 
-
-
-    const { data: showAllChatbotsData, isLoading: showAllChatbotsLoading }
-        = useSWR(`/api/v1/chatbots?page=${page}`, getAllChatbotsFetcher)
+    useEffect(() => {
+        if (showAllChatbotsData) {
+            const chatbotArray = showAllChatbotsData?.map(obj => obj.chatbots)
+            const metaArray = showAllChatbotsData?.map(obj => obj.meta)
+            const allChatbot = chatbotArray ? ([] as Chatbots[]).concat.apply([], chatbotArray) : [];
+            const lastMeta = metaArray ? metaArray.at(-1) : [];
+            setChatbots(allChatbot);
+            setMeta(lastMeta);
+            // console.log(lastMeta);
+        }
+    }, [showAllChatbotsData])
 
 
     useEffect(() => {
@@ -92,18 +98,6 @@ function ChatbotContainer() {
             setPage(parseInt(searchParams.get('page') || '2'));
         }
     }, [searchParams]);
-
-    useEffect(() => {
-        if (!showAllChatbotsLoading && showAllChatbotsData?.success) {
-            // setChatbots(showAllChatbotsData.chatbots);
-            setMeta(showAllChatbotsData.meta);
-            setLoad({ show: false });
-        } else if (showAllChatbotsData && !showAllChatbotsData?.success) {
-            setAlert({ title: showAllChatbotsData.error, type: 'error' });
-            setLoad({ show: false });
-        }
-    }, [showAllChatbotsLoading]);
-
 
     const handleDeleteChatbot = useCallback(async (chatbot_id: string) => {
         setLoad({ show: true, content: '正在刪除數據...' });
@@ -155,6 +149,7 @@ function ChatbotContainer() {
         <ChatbotView
             {...{
                 chatbots,
+                meta,
                 handleDeleteChatbot,
                 handleShare,
                 qrcodeContent,

@@ -9,7 +9,6 @@ export type AllChatbotsResponse = {
   success: boolean;
   error: string;
   meta: any;
-  has_more: boolean;
 }
 
 type Chatbots = {
@@ -42,20 +41,20 @@ export const getKey = (
   // tags: string[],
   keywords: string,
 ) => {
-  if (!pageIndex || previousPageData.has_more) {
-    // const params: any = { url: url, params: { page: pageIndex + 1, limit: 30, name: keywords } }
+  if (pageIndex == 0) {
+    const params: any = { url: '/api/v1/chatbots', params: { page: 1, limit: 30, name: keywords } }
+    return params
+  } else if (pageIndex > 0 || previousPageData?.meta.next_page) {
     const params: any = { url: '/api/v1/chatbots', params: { page: pageIndex + 1, limit: 30, name: keywords } }
-
-    // if (activeTab !== 'all')
-    //   params.params.mode = activeTab
-    // else
-    //   delete params.params.mode
-
-    // if (tags.length)
-    //   params.params.tag_ids = tags
-
     return params
   }
+  // if (pageIndex >= 0 || previousPageData?.has_more) {
+  //   const params: any = { url: '/api/v1/chatbots', params: { page: 1, limit: 30, name: keywords } }
+  //   return params
+  // } else if (pageIndex > 0 || previousPageData?.meta.next_page) {
+  //   const params: any = { url: '/api/v1/chatbots', params: { page: pageIndex + 1, limit: 30, name: keywords } }
+  //   return params
+  // }
   return null
 }
 

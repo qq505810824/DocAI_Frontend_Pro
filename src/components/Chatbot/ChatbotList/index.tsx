@@ -15,8 +15,7 @@ import moment from 'moment';
 import { useRouter } from 'next/navigation';
 import Dropdowns from '../feature/Dropdowns';
 
-import useSWRInfinite from 'swr/infinite'
-import { getAllChatbotsFetcher } from '../../../swr/chatbot'
+import { useState, useEffect, useRef } from 'react';
 
 interface ViewProps {
     chatbots: Chatbots[];
@@ -29,117 +28,110 @@ interface ViewProps {
 export default function ChatbotList(props: ViewProps) {
     const { chatbots, meta, handleDeleteChatbot, handleShare, anchorRef } = props;
     const router = useRouter();
+    const [isDataLoaded, setIsDataLoaded] = useState(false);
+    useEffect(() => {
+        // 数据加载逻辑...
 
+        // 数据加载完成后，设置 isDataLoaded 为 true
+        setIsDataLoaded(true);
+    }, []);
     return (
         <>
-            <Box sx={{ display: { xs: 'block', sm: 'none' } }} >
-                {chatbots.map((listItem) => (
-                    <List
-                        key={listItem.chatbot.id}
-                        size="sm"
-                        sx={{
-                            '--ListItem-paddingX': 0
-                        }}
-                    >
-                        <ListItem
+            {chatbots &&
+                <Box sx={{ display: { xs: 'block', sm: 'none' } }} >
+                    {chatbots.map((listItem) => (
+                        <List
+                            key={listItem.chatbot.id}
+                            size="sm"
                             sx={{
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'start'
+                                '--ListItem-paddingX': 0
                             }}
                         >
-                            <ListItemContent sx={{ display: 'flex', gap: 2, alignItems: 'start' }}>
-                                <ListItemDecorator>
-                                    <Avatar size="sm">
-                                        {listItem.chatbot.name.substring(0, 1)}
-                                    </Avatar>
-                                </ListItemDecorator>
-                                <div>
-                                    <Typography fontWeight={600} gutterBottom>
-                                        <Link
-                                            level="title-sm"
-                                            sx={{
-                                                fontWeight: 'bold',
-                                                color: 'black'
-                                            }}
-                                        >
-                                            <Typography
-                                                onClick={() => {
-                                                    handleShare(listItem.chatbot, true);
+                            <ListItem
+                                sx={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'start'
+                                }}
+                            >
+                                <ListItemContent sx={{ display: 'flex', gap: 2, alignItems: 'start' }}>
+                                    <ListItemDecorator>
+                                        <Avatar size="sm">
+                                            {listItem.chatbot.name.substring(0, 1)}
+                                        </Avatar>
+                                    </ListItemDecorator>
+                                    <div>
+                                        <Typography fontWeight={600} gutterBottom>
+                                            <Link
+                                                level="title-sm"
+                                                sx={{
+                                                    fontWeight: 'bold',
+                                                    color: 'black'
                                                 }}
                                             >
-                                                {listItem.chatbot.name}
-                                            </Typography>
-                                        </Link>
-                                    </Typography>
-                                    <Typography level="body-xs" gutterBottom>
-                                        {listItem.chatbot.description}
-                                    </Typography>
-                                    <Box
-                                        sx={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'space-between',
-                                            gap: 0.5,
-                                            mb: 1
-                                        }}
-                                    >
-                                        <Typography level="body-xs">
-                                            {moment(listItem.chatbot?.updated_at).format(
-                                                'YYYY-MM-DD HH:mm'
-                                            )}
+                                                <Typography
+                                                    onClick={() => {
+                                                        handleShare(listItem.chatbot, true);
+                                                    }}
+                                                >
+                                                    {listItem.chatbot.name}
+                                                </Typography>
+                                            </Link>
                                         </Typography>
-                                    </Box>
-                                    <Box
-                                        sx={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: 1,
-                                            mb: 1
-                                        }}
-                                    >
-                                        <Dropdowns
-                                            share={() => {
-                                                handleShare(listItem.chatbot);
+                                        <Typography level="body-xs" gutterBottom>
+                                            {listItem.chatbot.description}
+                                        </Typography>
+                                        <Box
+                                            sx={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'space-between',
+                                                gap: 0.5,
+                                                mb: 1
                                             }}
-                                            edit={() => {
-                                                router.push(
-                                                    `/chatbot/edit?id=${listItem.chatbot?.id}`
-                                                );
+                                        >
+                                            <Typography level="body-xs">
+                                                {moment(listItem.chatbot?.updated_at).format(
+                                                    'YYYY-MM-DD HH:mm'
+                                                )}
+                                            </Typography>
+                                        </Box>
+                                        <Box
+                                            sx={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: 1,
+                                                mb: 1
                                             }}
-                                            editQuesion={() => {
-                                                router.push(
-                                                    `/chatbot/${listItem.chatbot?.id}/assistive_question`
-                                                );
-                                            }}
-                                            remove={() => {
-                                                handleDeleteChatbot(listItem.chatbot);
-                                            }}
-                                        />
-                                    </Box>
-                                </div>
-                            </ListItemContent>
-                        </ListItem>
-                        <ListDivider />
-                    </List>
-                ))}
-                <div ref={anchorRef}>
-
-                    <Button
-                        color="primary"
-                        // startDecorator={<AddIcon />}
-                        size="sm"
-                        // disabled={isLoadingMore || isReachingEnd}
-                    >
-                        Load
-                        {/* {isLoadingMore
-                            ? "Loading..."
-                            : isReachingEnd
-                                ? "No more chatbot"
-                                : "Load More"} */}
-                    </Button>
-                </div>
-            </Box>
+                                        >
+                                            <Dropdowns
+                                                share={() => {
+                                                    handleShare(listItem.chatbot);
+                                                }}
+                                                edit={() => {
+                                                    router.push(
+                                                        `/chatbot/edit?id=${listItem.chatbot?.id}`
+                                                    );
+                                                }}
+                                                editQuesion={() => {
+                                                    router.push(
+                                                        `/chatbot/${listItem.chatbot?.id}/assistive_question`
+                                                    );
+                                                }}
+                                                remove={() => {
+                                                    handleDeleteChatbot(listItem.chatbot);
+                                                }}
+                                            />
+                                        </Box>
+                                    </div>
+                                </ListItemContent>
+                            </ListItem>
+                            <ListDivider />
+                        </List>
+                    ))}
+                    <div ref={anchorRef}></div>
+                </Box>
+            }
             <Box
                 sx={{ display: { xs: 'flex', md: 'none' }, alignItems: 'center', py: 2 }}
             >
