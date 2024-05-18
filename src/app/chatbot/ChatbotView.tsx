@@ -11,12 +11,7 @@ import { useRouter } from 'next/navigation';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Chatbot, Chatbots } from './ChatbotContainer';
 import PaginationView from '@/components/common/Widget/PaginationView';
-
-import useSWRInfinite from 'swr/infinite'
-import { getAllChatbotsFetcher, getChatbotsFetcher, getKey } from '../../swr/chatbot'
-import type { AllChatbotsResponse } from '../../swr/chatbot'
-import useSWR from 'swr'
-import { getAction } from '@/swr/common';
+import { useMediaQuery } from '@mui/material';
 
 interface ViewProps {
     chatbots: Chatbots[];
@@ -29,7 +24,6 @@ interface ViewProps {
     anchorRef: any;
 }
 
-const fetcher = (url: any) => fetch(url).then((res) => res.json());
 
 function ChatbotView(props: ViewProps) {
     const {
@@ -46,13 +40,7 @@ function ChatbotView(props: ViewProps) {
     const router = useRouter();
     const [visibleDelete, setVisibleDelete] = useState(false);
     const [currectChabot, setCurrectChabot] = useState<Chatbot>();
-
-
-    // const chatbotArray = chatbots?.map(obj => obj.chatbots)
-    // const metaArray = chatbots?.map(obj => obj.meta)
-    // const issues = chatbotArray ? ([] as Chatbots[]).concat.apply([], chatbotArray) : [];
-    // const lastMeta = metaArray ? metaArray[-1] : [];
-
+    const isMobileScreen = useMediaQuery('(max-width: 600px)');
     return (
         <>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -96,26 +84,29 @@ function ChatbotView(props: ViewProps) {
                 </Button>
             </Box>
             <SearchInputView handleSearch={() => { }} />
-            <ChatbotTable
-                chatbots={chatbots}
-                meta={meta}
-                handleDeleteChatbot={(chatbot: any) => {
-                    setCurrectChabot(chatbot);
-                    setVisibleDelete(true);
-                }}
-                handleShare={handleShare}
-                anchorRef={anchorRef}
-            />
-            <ChatbotList
-                chatbots={chatbots}
-                meta={meta}
-                handleDeleteChatbot={(chatbot: any) => {
-                    setCurrectChabot(chatbot);
-                    setVisibleDelete(true);
-                }}
-                handleShare={handleShare}
-                anchorRef={anchorRef}
-            />
+            {isMobileScreen ? (
+                <ChatbotList
+                    chatbots={chatbots}
+                    meta={meta}
+                    handleDeleteChatbot={(chatbot: any) => {
+                        setCurrectChabot(chatbot);
+                        setVisibleDelete(true);
+                    }}
+                    handleShare={handleShare}
+                    anchorRef={anchorRef}
+                />
+            ) : (
+                <ChatbotTable
+                    chatbots={chatbots}
+                    meta={meta}
+                    handleDeleteChatbot={(chatbot: any) => {
+                        setCurrectChabot(chatbot);
+                        setVisibleDelete(true);
+                    }}
+                    handleShare={handleShare}
+                    anchorRef={anchorRef}
+                />
+            )}
 
             <ShareQRcodeModal
                 visable={visibleQRcode}

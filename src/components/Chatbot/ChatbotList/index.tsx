@@ -28,17 +28,10 @@ interface ViewProps {
 export default function ChatbotList(props: ViewProps) {
     const { chatbots, meta, handleDeleteChatbot, handleShare, anchorRef } = props;
     const router = useRouter();
-    const [isDataLoaded, setIsDataLoaded] = useState(false);
-    useEffect(() => {
-        // 数据加载逻辑...
-
-        // 数据加载完成后，设置 isDataLoaded 为 true
-        setIsDataLoaded(true);
-    }, []);
     return (
         <>
             {chatbots &&
-                <Box sx={{ display: { xs: 'block', sm: 'none' } }} >
+                <Box sx={{ display: {xs: 'block', sm: 'none'} }} >
                     {chatbots.map((listItem) => (
                         <List
                             key={listItem.chatbot.id}
@@ -129,7 +122,8 @@ export default function ChatbotList(props: ViewProps) {
                             <ListDivider />
                         </List>
                     ))}
-                    <div ref={anchorRef}></div>
+                    <Box component="div" ref={anchorRef}
+                        sx={{ display: { xs: 'block', sm: 'none' } }}></Box >
                 </Box>
             }
             <Box

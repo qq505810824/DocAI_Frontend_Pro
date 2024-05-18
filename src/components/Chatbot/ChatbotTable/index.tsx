@@ -44,19 +44,18 @@ export default function ChatbotTable(props: ViewProps) {
 
 
     return (
-        // <React.Fragment>
-        <>
+        <React.Fragment>
             <Sheet
                 className="OrderTableContainer"
                 variant="outlined"
                 sx={{
-                    display: { xs: 'none', sm: 'initial' },
+                    display: { xs: 'none', sm: 'block' },
                     width: '100%',
                     borderRadius: 'sm',
                     flexShrink: 1,
-                    // overflow: 'auto',
+                    overflow: 'auto',
                     padding: 2,
-                    // minHeight: 0 //解决容器塌陷的问题
+                    minHeight: 0 //解决容器塌陷的问题
                 }}
             >
                 {chatbots.length == 0 ? (
@@ -171,7 +170,8 @@ export default function ChatbotTable(props: ViewProps) {
                         <ListDivider />
                     </List>
                 ))}
-                <div ref={anchorRef}></div>
+                <Box component="div" ref={anchorRef}
+                    sx={{ display: { xs: 'none', sm: 'block' } }}></Box >
             </Sheet>
             <Box
                 className="Pagination-laptopUp"
@@ -187,7 +187,6 @@ export default function ChatbotTable(props: ViewProps) {
             >
                 <PaginationView meta={meta} pathname={'/chatbot'} params={null} />
             </Box>
-        </>
-        // </React.Fragment>
+        </React.Fragment>
     );
 }

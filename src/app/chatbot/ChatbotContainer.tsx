@@ -38,7 +38,6 @@ function ChatbotContainer() {
     const { setAlert } = useAlert();
     const { setLoad } = useLoad();
     const searchParams = useSearchParams();
-    const [page, setPage] = useState(1);
     const [chatbots, setChatbots] = useState<Chatbots[]>([]);
     const [meta, setMeta] = useState<any>();
     const [visibleQRcode, setVisibleQRcode] = useState(false);
@@ -63,8 +62,6 @@ function ChatbotContainer() {
         let observer: IntersectionObserver | undefined
         if (anchorRef.current) {
             observer = new IntersectionObserver((entries) => {
-                console.log('条件判定：', entries[0].isIntersecting, !isLoading, hasMore)
-                console.log('观测', entries[0])
                 if (entries[0].isIntersecting && !isLoading && hasMore)
                     setSize((size: number) => size + 1)
             }, { rootMargin: '100px' })
@@ -87,17 +84,6 @@ function ChatbotContainer() {
         }
     }, [showAllChatbotsData])
 
-
-    useEffect(() => {
-        setLoad({ show: false });
-        // getAllChatbots(apiSetting.Chatbot.showAllChatbots(page));
-    }, [page]);
-
-    useEffect(() => {
-        if (searchParams) {
-            setPage(parseInt(searchParams.get('page') || '2'));
-        }
-    }, [searchParams]);
 
     const handleDeleteChatbot = useCallback(async (chatbot_id: string) => {
         setLoad({ show: true, content: '正在刪除數據...' });
